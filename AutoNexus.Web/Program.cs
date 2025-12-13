@@ -53,7 +53,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Erro ao criar usuários padrão.");
+        logger.LogError(ex, "Erro ao criar usuï¿½rios padrï¿½o.");
     }
 }
 

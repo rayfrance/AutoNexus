@@ -1,31 +1,78 @@
-html {
-  font-size: 14px;
+/* wwwroot/css/site.css */
+
+/* 1. Paleta AutoNexus */
+:root {
+    /* Cores da Marca */
+    --anx-dark-blue: #0d1b2a; /* Fundo Nav / Botões Hover */
+    --anx-steel-blue: #1b263b; /* Botões Principal */
+    --anx-accent: #415a77; /* Bordas / Detalhes */
+    --anx-light: #e0e1dd; /* Fundo Geral */
+    --anx-action: #d90429; /* Ações de perigo */
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
+/* 2. Customização Global do Bootstrap */
 body {
-  margin-bottom: 60px;
+    background-color: #f8f9fa; /* Bootstrap bg-light */
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* Navbar: Sobrescreve o bg-dark padrão se quiser, ou usa classes utilitárias */
+.bg-autonexus {
+    background-color: var(--anx-dark-blue) !important;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+/* 3. Sobrescrevendo Componentes Bootstrap */
+
+/* Botões: Mudamos o comportamento do .btn-primary nativo */
+.btn-primary {
+    background-color: var(--anx-steel-blue);
+    border-color: var(--anx-steel-blue);
+    font-weight: 600;
+    padding: 0.6rem 1.2rem; /* Mais espaçado, estilo moderno */
 }
+
+    .btn-primary:hover, .btn-primary:focus {
+        background-color: var(--anx-dark-blue);
+        border-color: var(--anx-dark-blue);
+        box-shadow: 0 4px 12px rgba(13, 27, 42, 0.3); /* Sombra suave */
+    }
+
+/* Cards: Refinando o componente .card nativo */
+.card-login {
+    border: none;
+    border-radius: 1rem; /* Bootstrap rounded-4 visualmente */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); /* Bootstrap shadow-lg */
+}
+
+.card-header-custom {
+    background: linear-gradient(135deg, var(--anx-dark-blue), var(--anx-steel-blue));
+    color: white;
+    border-radius: 1rem 1rem 0 0 !important;
+    padding: 2rem 1rem;
+}
+
+/* Inputs Flutuantes */
+.form-floating > .form-control:focus {
+    border-color: var(--anx-accent);
+    box-shadow: 0 0 0 0.25rem rgba(65, 90, 119, 0.25);
+}
+
+/* Links */
+a {
+    color: var(--anx-steel-blue);
+    text-decoration: none;
+}
+
+    a:hover {
+        color: var(--anx-dark-blue);
+        text-decoration: underline;
+    }
+
+.bg-autonexus .nav-link,
+.bg-autonexus .navbar-brand {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+    .bg-autonexus .nav-link:hover {
+        color: #ffffff !important;
+    }
