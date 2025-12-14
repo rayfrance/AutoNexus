@@ -49,8 +49,8 @@ namespace AutoNexus.Infrastructure.Data
         {
             return new()
             {
-                UserName = UserEmail,
-                Email = UserEmail,
+                UserName = userEmail,
+                Email = userEmail,
                 EmailConfirmed = true
             };
         }
