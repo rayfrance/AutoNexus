@@ -1,0 +1,66 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Registrar";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <div class="card card-login shadow-lg">
+                <div class="card-header-custom text-center">
+                    <h3 class="fw-bold mb-0">Nova Conta</h3>
+                    <small class="opacity-75">Junte-se ao time AutoNexus</small>
+                </div>
+
+                <div class="card-body p-4">
+                    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="name@example.com" />
+                            <label asp-for="Input.Email">E-mail Corporativo</label>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" placeholder="password" />
+                                    <label asp-for="Input.Password">Senha</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="password" />
+                                    <label asp-for="Input.ConfirmPassword">Confirmar</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <span asp-validation-for="Input.Password" class="text-danger small d-block"></span>
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small d-block"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button id="registerSubmit" type="submit" class="btn btn-primary btn-lg">Cadastrar</button>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <p class="mb-0 text-muted small">Já é cadastrado?</p>
+                            <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="fw-bold">
+                                Fazer Login
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
