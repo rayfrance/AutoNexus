@@ -8,6 +8,7 @@ namespace AutoNexus.Infrastructure.ExternalServices
     public class FipeService : IFipeService
     {
         private readonly HttpClient _httpClient;
+
         public FipeService(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -26,7 +27,7 @@ namespace AutoNexus.Infrastructure.ExternalServices
             // GET: https://parallelum.com.br/fipe/api/v1/carros/marcas/{id}/modelos
             var response = await _httpClient.GetFromJsonAsync<FipeModelResponse>($"{Constants.FIPE_URL}/marcas/{brandId}/modelos");
 
-            return response?.Modelos ?? Enumerable.Empty<FipeReferenceResponse>();
+            return response?.Models ?? Enumerable.Empty<FipeReferenceResponse>();
         }
     }
 }

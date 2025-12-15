@@ -1,4 +1,4 @@
 ﻿namespace AutoNexus.Application.DTOs.Fipe
 {
-    public record FipeReferenceResponse(string Codigo, string Nome);
+    public record FipeReferenceResponse(string Code, string Name);
 }

@@ -24,6 +24,7 @@ namespace AutoNexus.Domain
 
         #region External Services
         public const string FIPE_URL = "https://parallelum.com.br/fipe/api/v1/carros";
+        public const string VIACEP_URL = "https://viacep.com.br/ws";
         #endregion
     }
 }

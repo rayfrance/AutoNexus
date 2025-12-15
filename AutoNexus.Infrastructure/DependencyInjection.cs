@@ -23,6 +23,7 @@ namespace AutoNexus.Infrastructure
             });
 
             services.AddHttpClient<IFipeService, FipeService>();
+            services.AddHttpClient<IAddressService, ViaCepService>();
 
             return services;
         }
