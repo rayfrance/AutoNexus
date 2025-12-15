@@ -21,70 +21,90 @@ namespace AutoNexus.Web.Controllers
             _fipeService = fipeService;
         }
 
-        // LISTAGEM (Index)
-        public async Task<IActionResult> Index(string searchString, int? pageNumber)
+        #region 1. LEITURA (Listagem)
+
+        [ActionName("Index")]
+        public async Task<IActionResult> ListVehicles(string searchString, int? pageNumber)
         {
             int pageSize = 5;
             ViewData["CurrentFilter"] = searchString;
 
-            IQueryable<Vehicle> vehiclesQuery = GetVehicleQuery(searchString);
-            PaginatedList<Vehicle> paginatedResult = await PaginatedList<Vehicle>.CreateAsync(vehiclesQuery, pageNumber ?? 1, pageSize);
+            IQueryable<Vehicle> query = BuildSearchQuery(searchString);
+            PaginatedList<Vehicle> paginatedResult = await PaginatedList<Vehicle>.CreateAsync(query, pageNumber ?? 1, pageSize);
 
             return View(paginatedResult);
         }
 
-        private IQueryable<Vehicle> GetVehicleQuery(string searchString)
+        private IQueryable<Vehicle> BuildSearchQuery(string term)
         {
-            IQueryable<Vehicle> vehiclesQuery = GetBaseQuery();
-            vehiclesQuery = ApplySearchFilter(vehiclesQuery, searchString);
-            vehiclesQuery = ApplySorting(vehiclesQuery);
-            return vehiclesQuery;
+            IQueryable<Vehicle> query = GetBaseQueryWithIncludes();
+            query = FilterByBrandOrModel(query, term);
+            query = OrderByNewest(query);
+            return query;
         }
 
-        private IQueryable<Vehicle> GetBaseQuery()
+        private IQueryable<Vehicle> GetBaseQueryWithIncludes()
         {
-            return _context.Vehicles
-                .Include(v => v.Manufacturer)
-                .AsNoTracking();
+            return _context.Vehicles.Include(v => v.Manufacturer).AsNoTracking();
         }
 
-        private IQueryable<Vehicle> ApplySearchFilter(IQueryable<Vehicle> query, string searchString)
+        private IQueryable<Vehicle> FilterByBrandOrModel(IQueryable<Vehicle> query, string term)
         {
-            if (string.IsNullOrEmpty(searchString))
-                return query;
-
-            return query.Where(s => s.Model.Contains(searchString)
-                             || s.Manufacturer.Name.Contains(searchString));
+            if (string.IsNullOrEmpty(term)) return query;
+            return query.Where(v => v.Model.Contains(term) || v.Manufacturer.Name.Contains(term));
         }
 
-        private IQueryable<Vehicle> ApplySorting(IQueryable<Vehicle> query)
+        private IQueryable<Vehicle> OrderByNewest(IQueryable<Vehicle> query)
         {
             return query.OrderByDescending(v => v.CreatedAt);
         }
 
-        // CADASTRO (Create)
+        #endregion
 
-        public async Task<IActionResult> Create()
+        #region 2. ESCRITA (Cadastro)
+
+        [HttpGet]
+        [ActionName("Create")]
+        public async Task<IActionResult> OpenCreationForm()
         {
-            var viewModel = new VehicleFormViewModel
-            {
-                Manufacturers = await _context.Manufacturers.OrderBy(m => m.Name).ToListAsync()
-            };
-            return View(viewModel);
+            return View(await PrepareEmptyFormAsync());
         }
 
         [HttpPost]
+        [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VehicleFormViewModel viewModel)
+        public async Task<IActionResult> SubmitCreationForm(VehicleFormViewModel viewModel)
         {
             if (ModelState.IsValid)
-                return await CreateVehicleAsync(viewModel);
+            {
+                return await PersistVehicleToDatabase(viewModel);
+            }
 
-            viewModel.Manufacturers = await _context.Manufacturers.OrderBy(m => m.Name).ToListAsync();
-            return View(viewModel);
+            return View(await ReloadFormWithErrorsAsync(viewModel));
         }
 
-        private async Task<IActionResult> CreateVehicleAsync(VehicleFormViewModel viewModel)
+        // --- Helpers de Cadastro ---
+
+        private async Task<VehicleFormViewModel> PrepareEmptyFormAsync()
+        {
+            return new VehicleFormViewModel
+            {
+                Manufacturers = await GetManufacturersListAsync()
+            };
+        }
+
+        private async Task<VehicleFormViewModel> ReloadFormWithErrorsAsync(VehicleFormViewModel viewModel)
+        {
+            viewModel.Manufacturers = await GetManufacturersListAsync();
+            return viewModel;
+        }
+
+        private async Task<IEnumerable<Manufacturer>> GetManufacturersListAsync()
+        {
+            return await _context.Manufacturers.OrderBy(m => m.Name).ToListAsync();
+        }
+
+        private async Task<IActionResult> PersistVehicleToDatabase(VehicleFormViewModel viewModel)
         {
             var vehicle = new Vehicle
             {
@@ -98,10 +118,13 @@ namespace AutoNexus.Web.Controllers
 
             _context.Add(vehicle);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(ListVehicles));
         }
 
-        // AJAX API (Fipe Integration)
+        #endregion
+
+        #region  3. API AJAX (FIPE)
+
         [HttpGet]
         public async Task<JsonResult> GetModelsByManufacturer(int manufacturerId)
         {
@@ -112,17 +135,29 @@ namespace AutoNexus.Web.Controllers
 
             try
             {
-                IEnumerable<FipeReferenceResponse> fipeBrands = await _fipeService.GetBrandsAsync();
-                FipeReferenceResponse? selectedFipeBrand = fipeBrands.FirstOrDefault(b => b.Name.Equals(manufacturer.Name, StringComparison.OrdinalIgnoreCase));
-                if (selectedFipeBrand != null)
-                {
-                    IEnumerable<FipeReferenceResponse> models = await _fipeService.GetModelsAsync(selectedFipeBrand.Code);
-                    return Json(models.OrderBy(m => m.Name));
-                }
+                return await FetchModelsFromFipeApi(manufacturer.Name);
             }
-            catch {}
+            catch
+            {
+                return Json(new List<object>());
+            }
+        }
+
+        private async Task<JsonResult> FetchModelsFromFipeApi(string brandName)
+        {
+            IEnumerable<FipeReferenceResponse> fipeBrands = await _fipeService.GetBrandsAsync();
+
+            var selectedFipeBrand = fipeBrands.FirstOrDefault(b => b.Name.Equals(brandName, StringComparison.OrdinalIgnoreCase));
+
+            if (selectedFipeBrand != null)
+            {
+                var models = await _fipeService.GetModelsAsync(selectedFipeBrand.Code);
+                return Json(models.OrderBy(m => m.Name));
+            }
 
             return Json(new List<object>());
         }
+
+        #endregion
     }
 }
