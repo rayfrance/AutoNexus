@@ -2,6 +2,7 @@
 using AutoNexus.Application.DTOs.Address;
 using AutoNexus.Application.Interfaces;
 using AutoNexus.Domain;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AutoNexus.Infrastructure.ExternalServices
 {
@@ -17,6 +18,8 @@ namespace AutoNexus.Infrastructure.ExternalServices
         public async Task<ViaCepResponse?> GetAddressByZipCodeAsync(string zipCode)
         {
             string cleanZipCode = GetOnlyNumbers(zipCode);
+            if (cleanZipCode.Length != 8)
+                return null;
 
             try
             {
@@ -33,10 +36,12 @@ namespace AutoNexus.Infrastructure.ExternalServices
             }
         }
 
-        private static string GetOnlyNumbers(string zipCode)
+        private static string GetOnlyNumbers(string text)
         {
-            if (zipCode.Length != 8) return null;
-            return zipCode.Replace("-", "").Replace(".", "").Trim();
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+
+            return text.Replace("-", "").Replace(".", "").Trim();
         }
     }
 }
