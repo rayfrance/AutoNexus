@@ -5,6 +5,6 @@ namespace AutoNexus.Application.DTOs.Fipe
     public class FipeModelResponse
     {
         [JsonPropertyName("modelos")]
-        public IEnumerable<FipeReferenceResponse> Modelos { get; set; } = new List<FipeReferenceResponse>();
+        public IEnumerable<FipeReferenceResponse> Models { get; set; } = new List<FipeReferenceResponse>();
     }
 }
