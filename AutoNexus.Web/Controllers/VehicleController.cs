@@ -67,7 +67,7 @@ namespace AutoNexus.Web.Controllers
         [ActionName("Create")]
         public async Task<IActionResult> OpenCreationForm()
         {
-            return View(await PrepareEmptyFormAsync());
+            return View("CreationForm", await PrepareEmptyFormAsync());
         }
 
         [HttpPost]
@@ -76,11 +76,9 @@ namespace AutoNexus.Web.Controllers
         public async Task<IActionResult> SubmitCreationForm(VehicleFormViewModel viewModel)
         {
             if (ModelState.IsValid)
-            {
                 return await PersistVehicleToDatabase(viewModel);
-            }
 
-            return View(await ReloadFormWithErrorsAsync(viewModel));
+            return View("CreationForm", await ReloadFormWithErrorsAsync(viewModel));
         }
 
         // --- Helpers de Cadastro ---
@@ -106,7 +104,7 @@ namespace AutoNexus.Web.Controllers
 
         private async Task<IActionResult> PersistVehicleToDatabase(VehicleFormViewModel viewModel)
         {
-            var vehicle = new Vehicle
+            Vehicle vehicle = new()
             {
                 ManufacturerId = viewModel.ManufacturerId,
                 Model = viewModel.Model,
@@ -118,7 +116,7 @@ namespace AutoNexus.Web.Controllers
 
             _context.Add(vehicle);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(ListVehicles));
+            return RedirectToAction("Index"); ;
         }
 
         #endregion
@@ -128,7 +126,7 @@ namespace AutoNexus.Web.Controllers
         [HttpGet]
         public async Task<JsonResult> GetModelsByManufacturer(int manufacturerId)
         {
-            var manufacturer = await _context.Manufacturers.FindAsync(manufacturerId);
+            Manufacturer? manufacturer = await _context.Manufacturers.FindAsync(manufacturerId);
 
             if (manufacturer == null)
                 return Json(new List<object>());
@@ -145,13 +143,29 @@ namespace AutoNexus.Web.Controllers
 
         private async Task<JsonResult> FetchModelsFromFipeApi(string brandName)
         {
+            string cleanBrandName = brandName?.Trim() ?? "";
+
+            if (string.IsNullOrEmpty(cleanBrandName))
+                return Json(new List<object>());
+
             IEnumerable<FipeReferenceResponse> fipeBrands = await _fipeService.GetBrandsAsync();
 
-            var selectedFipeBrand = fipeBrands.FirstOrDefault(b => b.Name.Equals(brandName, StringComparison.OrdinalIgnoreCase));
+            var selectedFipeBrand = fipeBrands.FirstOrDefault(b =>
+            {
+                string fipeName = b.Name.Trim();
+
+                bool exactMatch = string.Equals(fipeName, cleanBrandName, StringComparison.CurrentCultureIgnoreCase);
+
+                bool containsMatch = fipeName.IndexOf(cleanBrandName, StringComparison.CurrentCultureIgnoreCase) >= 0;
+
+                bool reverseContains = cleanBrandName.IndexOf(fipeName, StringComparison.CurrentCultureIgnoreCase) >= 0;
+
+                return exactMatch || containsMatch || reverseContains;
+            });
 
             if (selectedFipeBrand != null)
             {
-                var models = await _fipeService.GetModelsAsync(selectedFipeBrand.Code);
+                var models = await _fipeService.GetModelsAsync(selectedFipeBrand.Code.ToString()!);
                 return Json(models.OrderBy(m => m.Name));
             }
 
