@@ -1,0 +1,42 @@
+﻿using System.Net.Http.Json;
+using AutoNexus.Application.DTOs.Address;
+using AutoNexus.Application.Interfaces;
+using AutoNexus.Domain;
+
+namespace AutoNexus.Infrastructure.ExternalServices
+{
+    public class ViaCepService : IAddressService
+    {
+        private readonly HttpClient _httpClient;
+
+        public ViaCepService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        public async Task<ViaCepResponse?> GetAddressByZipCodeAsync(string zipCode)
+        {
+            string cleanZipCode = GetOnlyNumbers(zipCode);
+
+            try
+            {
+                var response = await _httpClient.GetFromJsonAsync<ViaCepResponse>($"{Constants.VIACEP_URL}/{cleanZipCode}/json/");
+
+                if (response != null && response.Error)
+                    return null;
+
+                return response;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static string GetOnlyNumbers(string zipCode)
+        {
+            if (zipCode.Length != 8) return null;
+            return zipCode.Replace("-", "").Replace(".", "").Trim();
+        }
+    }
+}
