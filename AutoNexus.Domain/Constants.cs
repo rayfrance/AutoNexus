@@ -5,24 +5,25 @@ namespace AutoNexus.Domain
     public static class Constants
     {
         #region Roles
-        public const string AdminRole = "Admin";
-        public const string SellerRole = "Vendedor";
+        public const string ADMIN_ROLE = "Admin";
+        public const string SELLER_ROLE = "Vendedor";
 
         public static readonly IReadOnlyCollection<string> AllRoles = new ReadOnlyCollection<string>(new[]
         {
-            AdminRole,
-            SellerRole
+            ADMIN_ROLE,
+            SELLER_ROLE
         });
         #endregion
 
-        #region Seed Users - Admin
-        public const string AdminEmail = "admin@autonexus.com";
-        public const string AdminPassword = "Admin@123";
+        #region Seed Users
+        public const string ADMIN_EMAIL = "admin@autonexus.com";
+        public const string ADMIN_PASSWORD = "Admin@123";
+        public const string SELLER_EMAIL = "vendedor@autonexus.com";
+        public const string SELLER_PASSWORD = "Vendedor@123";
         #endregion
 
-        #region Seed Users - Vendedor
-        public const string SellerEmail = "vendedor@autonexus.com";
-        public const string SellerPassword = "Vendedor@123";
+        #region External Services
+        public const string FIPE_URL = "https://parallelum.com.br/fipe/api/v1/carros";
         #endregion
     }
 }

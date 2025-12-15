@@ -1,4 +1,6 @@
-﻿using AutoNexus.Infrastructure.Data;
+﻿using AutoNexus.Application.Interfaces;
+using AutoNexus.Infrastructure.Data;
+using AutoNexus.Infrastructure.ExternalServices;
 using AutoNexus.Infrastructure.Persistence.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +21,8 @@ namespace AutoNexus.Infrastructure
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
                        .AddInterceptors(interceptor);
             });
+
+            services.AddHttpClient<IFipeService, FipeService>();
 
             return services;
         }

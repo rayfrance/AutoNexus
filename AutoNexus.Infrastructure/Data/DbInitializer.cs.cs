@@ -27,23 +27,23 @@ namespace AutoNexus.Infrastructure.Data
         }
         private static async Task CreateSellerUser(UserManager<IdentityUser> userManager)
         {
-            if (await userManager.FindByEmailAsync(Constants.SellerEmail) != null)
+            if (await userManager.FindByEmailAsync(Constants.SELLER_EMAIL) != null)
                 return;
 
-            IdentityUser sellerUser = CreateUser(Constants.SellerEmail);
+            IdentityUser sellerUser = CreateUser(Constants.SELLER_EMAIL);
 
-            await userManager.CreateAsync(sellerUser, Constants.SellerPassword);
-            await userManager.AddToRoleAsync(sellerUser, Constants.SellerRole);
+            await userManager.CreateAsync(sellerUser, Constants.SELLER_PASSWORD);
+            await userManager.AddToRoleAsync(sellerUser, Constants.SELLER_ROLE);
         }
         private static async Task CreateAdminUser(UserManager<IdentityUser> userManager)
         {
-            if (await userManager.FindByEmailAsync(Constants.AdminEmail) != null)
+            if (await userManager.FindByEmailAsync(Constants.ADMIN_EMAIL) != null)
                 return;
 
-            IdentityUser adminUser = CreateUser(Constants.AdminEmail);
+            IdentityUser adminUser = CreateUser(Constants.ADMIN_EMAIL);
 
-            await userManager.CreateAsync(adminUser, Constants.AdminPassword);
-            await userManager.AddToRoleAsync(adminUser, Constants.AdminRole);
+            await userManager.CreateAsync(adminUser, Constants.ADMIN_PASSWORD);
+            await userManager.AddToRoleAsync(adminUser, Constants.ADMIN_ROLE);
         }
         private static IdentityUser CreateUser(string userEmail)
         {
