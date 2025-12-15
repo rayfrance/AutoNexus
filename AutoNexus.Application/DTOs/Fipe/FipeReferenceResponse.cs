@@ -8,6 +8,6 @@ namespace AutoNexus.Application.DTOs.Fipe
         public string Name { get; set; } = string.Empty;
 
         [JsonPropertyName("codigo")]
-        public string Code { get; set; } = string.Empty;
+        public object Code { get; set; } = null!;
     }
 }
