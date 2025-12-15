@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using AutoNexus.Application.Common;
+using System.Text.Json.Serialization;
 
 namespace AutoNexus.Application.DTOs.Fipe
 {
