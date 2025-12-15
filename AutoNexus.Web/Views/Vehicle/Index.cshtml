@@ -1,96 +1,88 @@
-﻿@using AutoNexus.Application.Common
-@model PaginatedList<AutoNexus.Domain.Entities.Vehicle>
+﻿@model AutoNexus.Application.Common.PaginatedList<AutoNexus.Domain.Entities.Vehicle>
 
 @{
     ViewData["Title"] = "Veículos";
     Layout = "~/Pages/Shared/_Layout.cshtml";
+    string? currentFilter = ViewData["CurrentFilter"] as string;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Veículos</h1>
-
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Veículos</h2>
     <a asp-action="Create" class="btn btn-primary">
         <i class="bi bi-plus-lg"></i> Novo Veículo
     </a>
 </div>
 
-<form asp-action="Index" method="get" class="mb-3">
-    <div class="input-group">
-        <input type="text" name="searchString" class="form-control" placeholder="Buscar por modelo ou fabricante..." value="@ViewData["CurrentFilter"]">
-        <button class="btn btn-outline-secondary" type="submit">Buscar</button>
-        @if (ViewData["CurrentFilter"] != null)
-        {
-            <a asp-action="Index" class="btn btn-outline-danger">Limpar</a>
-        }
-    </div>
-</form>
-
-<div class="card shadow-sm">
-    <div class="card-body">
-        @if (!Model.Any())
-        {
-            <div class="alert alert-info">Nenhum veículo encontrado.</div>
-        }
-        else
-        {
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Modelo</th>
-                        <th>Fabricante</th>
-                        <th>Ano</th>
-                        <th>Preço</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td class="fw-bold">@item.Model</td>
-                            <td>@item.Manufacturer?.Name</td>
-                            <td>@item.Year</td>
-                            <td>@item.Price.ToString("C")</td>
-                            <td>
-                                @if (item.Status == AutoNexus.Domain.Enums.VehicleStatus.Available)
-                                {
-                                    <span class="badge bg-success">Disponível</span>
-                                }
-                                else if (item.Status == AutoNexus.Domain.Enums.VehicleStatus.Sold)
-                                {
-                                    <span class="badge bg-danger">Vendido</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-warning text-dark">Reservado</span>
-                                }
-                            </td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-outline-primary">Editar</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="d-flex justify-content-center gap-2 mt-3">
-                <a asp-action="Index"
-                   asp-route-pageNumber="@(Model.PageIndex - 1)"
-                   asp-route-searchString="@ViewData["CurrentFilter"]"
-                   class="btn btn-outline-secondary @(!Model.HasPreviousPage ? "disabled" : "")">
-                    &laquo; Anterior
-                </a>
-
-                <span class="align-self-center">Página @Model.PageIndex de @Model.TotalPages</span>
-
-                <a asp-action="Index"
-                   asp-route-pageNumber="@(Model.PageIndex + 1)"
-                   asp-route-searchString="@ViewData["CurrentFilter"]"
-                   class="btn btn-outline-secondary @(!Model.HasNextPage ? "disabled" : "")">
-                    Próximo &raquo;
-                </a>
-            </div>
-        }
-    </div>
+<div class="card p-3 mb-4">
+    <form asp-action="Index" method="get" class="row g-2">
+        <div class="col-md-10">
+            <input type="text" name="searchString" value="@currentFilter" class="form-control" placeholder="Buscar por modelo ou fabricante..." />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-outline-secondary w-100">Buscar</button>
+        </div>
+    </form>
 </div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Modelo</th>
+                <th>Fabricante</th>
+                <th>Ano</th>
+                <th>Preço</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@item.Model</td>
+                    <td>@item.Manufacturer.Name</td>
+                    <td>@item.Year</td>
+                    <td>@item.Price.ToString("C")</td>
+                    <td>
+                        <span class="badge bg-success">@item.Status</span>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Editar">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Deletar">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<nav aria-label="Navegação de página">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+            <a asp-action="Index"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
+               asp-route-searchString="@currentFilter"
+               class="page-link">
+                &laquo; Anterior
+            </a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">Página @Model.PageIndex de @Model.TotalPages</span>
+        </li>
+        <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+            <a asp-action="Index"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
+               asp-route-searchString="@currentFilter"
+               class="page-link">
+                Próximo &raquo;
+            </a>
+        </li>
+    </ul>
+</nav>

@@ -1,0 +1,46 @@
+﻿@model AutoNexus.Domain.Entities.Vehicle
+
+@{
+    ViewData["Title"] = "Deletar Veículo";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="alert alert-danger border-danger">
+                <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Atenção!</h4>
+                <p>Tem certeza que deseja remover este veículo? Esta ação não pode ser desfeita.</p>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Detalhes do Veículo</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Fabricante</dt>
+                        <dd class="col-sm-9">@Model.Manufacturer.Name</dd>
+
+                        <dt class="col-sm-3">Modelo</dt>
+                        <dd class="col-sm-9">@Model.Model</dd>
+
+                        <dt class="col-sm-3">Ano</dt>
+                        <dd class="col-sm-9">@Model.Year</dd>
+
+                        <dt class="col-sm-3">Preço</dt>
+                        <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
+                    </dl>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash-fill"></i> Confirmar Deleção
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
