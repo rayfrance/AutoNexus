@@ -10,11 +10,6 @@ namespace AutoNexus.Web.Pages
     {
         private readonly ApplicationDbContext _context;
         private readonly GeminiService _geminiService;
-        public IndexModel(ApplicationDbContext context, GeminiService geminiService)
-        {
-            _context = context;
-            _geminiService = geminiService;
-        }
         public int TotalVehiclesAvailable { get; set; }
         public decimal TotalStockValue { get; set; }
         public int ActiveCustomersCount { get; set; }
@@ -24,6 +19,12 @@ namespace AutoNexus.Web.Pages
         public List<int> VehicleCounts { get; set; } = new();
         public string AiInsights { get; set; } = string.Empty;
 
+        public IndexModel(ApplicationDbContext context, GeminiService geminiService)
+        {
+            _context = context;
+            _geminiService = geminiService;
+        }
+
         public async Task<IActionResult> OnGetAsync()
         {
             if (!User.Identity.IsAuthenticated)
@@ -31,13 +32,17 @@ namespace AutoNexus.Web.Pages
                 return RedirectToPage("/Account/Login", new { area = "Identity" });
             }
 
+            await LoadAllDashboardData();
+
+            return Page();
+        }
+        private async Task LoadAllDashboardData()
+        {
             var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
             await GetKpiData(firstDayOfMonth);
 
             await GetChartData(firstDayOfMonth);
-
-            return Page();
         }
 
         private async Task GetKpiData(DateTime firstDayOfMonth)
@@ -87,7 +92,9 @@ namespace AutoNexus.Web.Pages
 
 
         public async Task<IActionResult> OnPostGenerateInsightsAsync()
-        {           
+        {
+            await LoadAllDashboardData();
+
             var reportData = new
             {
                 CurrentRevenue = RevenueThisMonth,
@@ -97,8 +104,15 @@ namespace AutoNexus.Web.Pages
                 TopManufacturers = ManufacturerLabels
             };
 
-            string jsonData = System.Text.Json.JsonSerializer.Serialize(reportData);
-            AiInsights = await _geminiService.GetVendasInsightsAsync(jsonData);
+            try
+            {
+                string jsonData = System.Text.Json.JsonSerializer.Serialize(reportData);
+                AiInsights = await _geminiService.GetVendasInsightsAsync(jsonData, ManufacturerLabels);
+            }
+            catch (Exception ex)
+            {
+                AiInsights = "Erro ao processar: " + ex.Message;
+            }
 
             return Page();
         }

@@ -37,9 +37,6 @@ app.MapRazorPages();
 app.MapDefaultControllerRoute(); 
 app.MapStaticAssets();
 
-
-
-
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
