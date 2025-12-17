@@ -9,11 +9,7 @@ namespace AutoNexus.Web.Pages
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-
-        public IndexModel(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly GeminiService _geminiService;
         public int TotalVehiclesAvailable { get; set; }
         public decimal TotalStockValue { get; set; }
         public int ActiveCustomersCount { get; set; }
@@ -21,6 +17,13 @@ namespace AutoNexus.Web.Pages
         public decimal RevenueThisMonth { get; set; }
         public List<string> ManufacturerLabels { get; set; } = new();
         public List<int> VehicleCounts { get; set; } = new();
+        public string AiInsights { get; set; } = string.Empty;
+
+        public IndexModel(ApplicationDbContext context, GeminiService geminiService)
+        {
+            _context = context;
+            _geminiService = geminiService;
+        }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -29,13 +32,17 @@ namespace AutoNexus.Web.Pages
                 return RedirectToPage("/Account/Login", new { area = "Identity" });
             }
 
+            await LoadAllDashboardData();
+
+            return Page();
+        }
+        private async Task LoadAllDashboardData()
+        {
             var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 
             await GetKpiData(firstDayOfMonth);
 
             await GetChartData(firstDayOfMonth);
-
-            return Page();
         }
 
         private async Task GetKpiData(DateTime firstDayOfMonth)
@@ -81,6 +88,33 @@ namespace AutoNexus.Web.Pages
 
             ManufacturerLabels = stockByManufacturer.Select(x => x.Name).ToList();
             VehicleCounts = stockByManufacturer.Select(x => x.Count).ToList();
+        }
+
+
+        public async Task<IActionResult> OnPostGenerateInsightsAsync()
+        {
+            await LoadAllDashboardData();
+
+            var reportData = new
+            {
+                CurrentRevenue = RevenueThisMonth,
+                TotalSales = SalesThisMonthCount,
+                StockValue = TotalStockValue,
+                AvailableCars = TotalVehiclesAvailable,
+                TopManufacturers = ManufacturerLabels
+            };
+
+            try
+            {
+                string jsonData = System.Text.Json.JsonSerializer.Serialize(reportData);
+                AiInsights = await _geminiService.GetVendasInsightsAsync(jsonData, ManufacturerLabels);
+            }
+            catch (Exception ex)
+            {
+                AiInsights = "Erro ao processar: " + ex.Message;
+            }
+
+            return Page();
         }
     }
 }

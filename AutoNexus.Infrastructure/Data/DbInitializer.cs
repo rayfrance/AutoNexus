@@ -16,6 +16,7 @@ namespace AutoNexus.Infrastructure.Data
 
             await SeedIdentitiesAsync(userManager, roleManager);
             await SeedVehiclesAsync(context);
+            await SeedClientsAsync(context);
         }
 
         private static async Task SeedIdentitiesAsync(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
@@ -29,10 +30,30 @@ namespace AutoNexus.Infrastructure.Data
         {
             if (context.Vehicles.Any()) return;
 
-            // 1. Criar Fabricantes
             Manufacturer[] manufacturers = await CreateManufacturerAsync(context);
-            // 2. Criar Veículos (Vinculando aos fabricantes criados acima)
+
             await CreateVehiclesAsync(context, manufacturers);
+        }
+        private static async Task SeedClientsAsync(ApplicationDbContext context)
+        {
+            if (context.Clients.Any()) return;
+
+            await CreateClientsAsync(context);
+        }
+
+        private static async Task CreateClientsAsync(ApplicationDbContext context)
+        {
+            var clients = new Client[]
+            {
+                new Client { Name = "Yasmin Souza", CPF = "51164241702", Phone = "11988887777" },
+                new Client { Name = "Tatiane Alves", CPF = "26063705031", Phone = "21977776666" },
+                new Client { Name = "Gabriel Dumke", CPF = "13366107006", Phone = "31966665555" },
+                new Client { Name = "Ana Teresa", CPF = "75894789036", Phone = "41955554444" },
+                new Client { Name = "Sandra Maria", CPF = "29630280086", Phone = "51944443333" }
+            };
+
+            await context.Clients.AddRangeAsync(clients);
+            await context.SaveChangesAsync();
         }
 
         private static async Task CreateVehiclesAsync(ApplicationDbContext context, Manufacturer[] manufacturers)
