@@ -101,6 +101,8 @@ namespace AutoNexus.Web.Controllers
                 Model = viewModel.Model,
                 Year = viewModel.Year,
                 Price = viewModel.Price,
+                Type = viewModel.Type,
+                Description = viewModel.Description,
                 Status = VehicleStatus.Available,
                 CreatedAt = DateTime.UtcNow
             };
@@ -161,6 +163,8 @@ namespace AutoNexus.Web.Controllers
                 Model = vehicle.Model,
                 Year = vehicle.Year,
                 Price = vehicle.Price,
+                Type = vehicle.Type,
+                Description = vehicle.Description,
                 Manufacturers = await GetManufacturersListAsync()
             };
         }
@@ -175,6 +179,8 @@ namespace AutoNexus.Web.Controllers
                 vehicleToUpdate.Model = viewModel.Model;
                 vehicleToUpdate.Year = viewModel.Year;
                 vehicleToUpdate.Price = viewModel.Price;
+                vehicleToUpdate.Type = viewModel.Type;
+                vehicleToUpdate.Description = viewModel.Description;
 
                 _context.Update(vehicleToUpdate);
                 await _context.SaveChangesAsync();
