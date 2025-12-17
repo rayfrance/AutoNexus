@@ -9,10 +9,11 @@ namespace AutoNexus.Web.Pages
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-
-        public IndexModel(ApplicationDbContext context)
+        private readonly GeminiService _geminiService;
+        public IndexModel(ApplicationDbContext context, GeminiService geminiService)
         {
             _context = context;
+            _geminiService = geminiService;
         }
         public int TotalVehiclesAvailable { get; set; }
         public decimal TotalStockValue { get; set; }
@@ -21,6 +22,7 @@ namespace AutoNexus.Web.Pages
         public decimal RevenueThisMonth { get; set; }
         public List<string> ManufacturerLabels { get; set; } = new();
         public List<int> VehicleCounts { get; set; } = new();
+        public string AiInsights { get; set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -81,6 +83,24 @@ namespace AutoNexus.Web.Pages
 
             ManufacturerLabels = stockByManufacturer.Select(x => x.Name).ToList();
             VehicleCounts = stockByManufacturer.Select(x => x.Count).ToList();
+        }
+
+
+        public async Task<IActionResult> OnPostGenerateInsightsAsync()
+        {           
+            var reportData = new
+            {
+                CurrentRevenue = RevenueThisMonth,
+                TotalSales = SalesThisMonthCount,
+                StockValue = TotalStockValue,
+                AvailableCars = TotalVehiclesAvailable,
+                TopManufacturers = ManufacturerLabels
+            };
+
+            string jsonData = System.Text.Json.JsonSerializer.Serialize(reportData);
+            AiInsights = await _geminiService.GetVendasInsightsAsync(jsonData);
+
+            return Page();
         }
     }
 }

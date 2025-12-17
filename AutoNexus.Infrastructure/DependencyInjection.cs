@@ -32,6 +32,8 @@ namespace AutoNexus.Infrastructure
 
             services.AddScoped<ISaleService, SaleService>();
 
+            services.AddHttpClient<GeminiService>()
+
             return services;
         }
     }

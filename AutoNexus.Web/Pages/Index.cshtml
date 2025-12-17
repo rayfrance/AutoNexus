@@ -100,6 +100,26 @@
             </div>
         </div>
 
+        <div class="card border-0 shadow-sm mb-4 bg-dark text-white">
+            <div class="card-body">
+                <h5 class="fw-bold"><i class="bi bi-robot me-2"></i>Consultor IA Gemini</h5>
+                <p class="small opacity-75">Obtenha uma análise estratégica baseada nos seus números atuais.</p>
+
+                <form method="post" asp-page-handler="GenerateInsights">
+                    <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">
+                        Gerar Insights de Vendas
+                    </button>
+                </form>
+
+                @if (!string.IsNullOrEmpty(Model.AiInsights))
+                {
+                    <div class="mt-3 p-3 bg-secondary bg-opacity-25 rounded small border border-secondary">
+                        @Model.AiInsights
+                    </div>
+                }
+            </div>
+        </div>
+
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white border-0 py-3">
