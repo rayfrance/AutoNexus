@@ -1,6 +1,7 @@
 ﻿using AutoNexus.Application.Common;
 using AutoNexus.Application.DTOs.Fipe;
 using AutoNexus.Application.Interfaces;
+using AutoNexus.Domain;
 using AutoNexus.Domain.Entities;
 using AutoNexus.Domain.Enums;
 using AutoNexus.Infrastructure.Data;
@@ -27,12 +28,11 @@ namespace AutoNexus.Web.Controllers
         [ActionName("Index")]
         public async Task<IActionResult> ListVehicles(string searchString, int? pageNumber)
         {
-            int pageSize = 5;
             ViewData["CurrentFilter"] = searchString;
 
             IQueryable<Vehicle> query = BuildSearchQuery(searchString);
 
-            PaginatedList<Vehicle> paginatedResult = await PaginatedList<Vehicle>.CreateAsync(query, pageNumber ?? 1, pageSize);
+            PaginatedList<Vehicle> paginatedResult = await PaginatedList<Vehicle>.CreateAsync(query, pageNumber ?? 1, Constants.DEFAULT_PAGE_SIZE);
 
             return View(paginatedResult);
         }

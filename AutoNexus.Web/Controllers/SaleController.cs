@@ -2,6 +2,7 @@
 using AutoNexus.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using AutoNexus.Application.DTOs.Sales;
+using AutoNexus.Domain;
 
 namespace AutoNexus.Web.Controllers
 {
@@ -14,7 +15,21 @@ namespace AutoNexus.Web.Controllers
             _saleService = saleService;
         }
 
-        #region 1. CRIAÇÃO (Create Sale)
+        #region 1. LEITURA 
+
+        [HttpGet]
+        public async Task<IActionResult> Index(string searchString, int? pageNumber)
+        {
+            ViewData["CurrentFilter"] = searchString;
+
+            var paginatedSales = await _saleService.SearchSalesAsync(searchString, pageNumber ?? 1, Constants.DEFAULT_PAGE_SIZE);
+
+            return View(paginatedSales);
+        }
+
+        #endregion
+
+        #region 2. CRIAÇÃO 
 
         [HttpGet]
         [ActionName("Create")]
@@ -45,33 +60,39 @@ namespace AutoNexus.Web.Controllers
 
                     await _saleService.ProcessSaleAsync(dto);
 
-                    return RedirectToAction("Index", "Vehicle");
+                    return RedirectToAction("Index");
                 }
                 catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.Message);
                 }
             }
+
             SaleFormViewModel reloadedViewModel = await ReloadFormWithErrorsAsync(viewModel);
             return View("CreationForm", reloadedViewModel);
         }
 
         #endregion
 
-        #region 2. MÉTODOS AUXILIARES (Helpers)
+        #region 3. MÉTODOS AUXILIARES 
 
+        /// <summary>
+        /// Cria um ViewModel novo e carrega a lista de carros disponíveis.
+        /// </summary>
         private async Task<SaleFormViewModel> PrepareEmptyFormAsync()
         {
             return new SaleFormViewModel
             {
                 AvailableVehicles = await _saleService.GetAvailableVehiclesAsync(),
-                SaleDate = DateTime.Today 
+                SaleDate = DateTime.Today
             };
         }
 
+        /// <summary>
+        /// Recarrega apenas os dados do banco (Dropdowns) em caso de erro de validação.
+        /// </summary>
         private async Task<SaleFormViewModel> ReloadFormWithErrorsAsync(SaleFormViewModel viewModel)
         {
-            // Apenas recarrega a lista do banco, mantendo os dados de input do usuário
             viewModel.AvailableVehicles = await _saleService.GetAvailableVehiclesAsync();
             return viewModel;
         }
