@@ -17,7 +17,6 @@ namespace AutoNexus.Web.Models
         public string Model { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "O Ano é obrigatório")]
-        [Range(1900, 2100, ErrorMessage = "Ano inválido")]
         public int Year { get; set; }
 
         [StringLength(500, ErrorMessage = "Máximo de 500 caracteres.")]
@@ -25,7 +24,7 @@ namespace AutoNexus.Web.Models
 
         [Required(ErrorMessage = "O Preço é obrigatório")]
         [DataType(DataType.Currency)]
-        [Range(0.01, double.MaxValue, ErrorMessage = "O preço deve ser um valor positivo.")] // <--- ADICIONE ISSO
+        [Range(0.01, double.MaxValue, ErrorMessage = "O preço deve ser um valor positivo.")]
         public decimal Price { get; set; }
 
         [Required(ErrorMessage = "O tipo é obrigatório.")]

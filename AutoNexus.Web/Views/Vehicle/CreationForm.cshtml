@@ -62,7 +62,7 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label asp-for="Year" class="form-label">Ano</label>
-                        <input asp-for="Year" class="form-control" type="number" min="1900" max="2100" />
+                        <input asp-for="Year" class="form-control" type="number" placeholder="@DateTime.Now.Year" />
                         <span asp-validation-for="Year" class="text-danger"></span>
                     </div>
 
@@ -84,7 +84,7 @@
 
                 <div class="mb-3">
                     <label asp-for="Description" class="form-label">Descrição</label>
-                    <textarea asp-for="Description" class="form-control" rows="3" maxlength="500"></textarea>
+                    <textarea asp-for="Description" class="form-control" rows="3" maxlength="500" placeholder="Insira detalhes adicionais sobre o veículo..."></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
 
@@ -142,43 +142,48 @@
             const $ddlType = $('#Type');
             const $txtDesc = $('#Description');
 
-            // Novos Elementos (Toggle e Badge)
             const $toggleManual = $('#manualModeToggle');
             const $badgeStatus = $('#fipeStatusBadge');
             const $fipeCard = $('#fipeCard');
+
+            // FUNÇÃO AUXILIAR: LIMPAR DADOS
+            function clearVehicleData() {
+                if ($txtDesc.val() !== "Buscando dados na FIPE...") {
+                    $txtYear.val('');
+                    $txtPrice.val('');
+                    $ddlType.val('');
+                    $txtDesc.val('');
+                }
+            }
 
             // --- LÓGICA 0: TOGGLE MODO MANUAL/AUTO ---
             $toggleManual.change(function() {
                 const isManual = $(this).is(':checked');
 
                 if (isManual) {
-                    // ATIVA MODO MANUAL
-                    $fipeCard.addClass('opacity-50'); // Deixa transparente
+                    $fipeCard.addClass('opacity-50');
                     $ddlFipeYear.prop('disabled', true);
-
-                    // Atualiza Badge
                     $badgeStatus.removeClass('bg-info text-dark').addClass('bg-secondary text-white').text('Modo Manual');
 
-                    // Limpa placeholder da descrição se tiver
                     if($txtDesc.val() === "Buscando dados na FIPE...") $txtDesc.val("");
 
                 } else {
-                    // VOLTA PARA AUTOMÁTICO
                     $fipeCard.removeClass('opacity-50');
                     $badgeStatus.removeClass('bg-secondary text-white').addClass('bg-info text-dark').text('Automação FIPE Ativa');
 
-                    // Reativa o campo se já tiver modelo selecionado
                     if ($ddlModel.val()) {
                         $ddlFipeYear.prop('disabled', false);
                     }
                 }
             });
 
-            // --- LÓGICA 1: CARREGAR MODELOS ---
+            // LÓGICA 1: CARREGAR MODELOS 
             $ddlManufacturer.on('change', function () {
                 const manufacturerId = $(this).val();
 
-                // Reseta dependentes
+                clearVehicleData();
+
+                // Reseta dropdowns
                 $ddlModel.empty().append(new Option("Carregando...", "", true, true)).trigger('change');
                 $ddlFipeYear.empty().append(new Option("-- Selecione o Modelo primeiro --", "")).trigger('change').prop('disabled', true);
 
@@ -208,9 +213,11 @@
                 });
             });
 
-            // --- LÓGICA 2: CARREGAR VERSÕES FIPE ---
+            // LÓGICA 2: CARREGAR VERSÕES FIPE
             $ddlModel.on('change', function () {
-                // Se estiver em modo manual, não carrega FIPE
+                // Sempre que mudar o modelo, limpa os dados do carro anterior
+                clearVehicleData();
+
                 if ($toggleManual.is(':checked')) return;
 
                 const modelCode = $(this).val();
@@ -244,7 +251,7 @@
                 });
             });
 
-            // --- LÓGICA 3: AUTO-PREENCHIMENTO ---
+            // LÓGICA 3: AUTO-PREENCHIMENTO 
             $ddlFipeYear.on('change', function () {
                 const yearCode = $(this).val();
                 const modelCode = $ddlModel.val();
@@ -268,14 +275,12 @@
                 });
             });
 
-            // --- LÓGICA 4: SUBMIT DO FORMULÁRIO ---
+            // LÓGICA 4: SUBMIT 
             $('#createForm').on('submit', function () {
                 const selectedText = $("#Model option:selected").text();
-
                 if (selectedText && selectedText !== "-- Selecione um Modelo --") {
                     $("#Model option:selected").val(selectedText);
                 }
-
                 $ddlModel.prop('disabled', false);
             });
         });
