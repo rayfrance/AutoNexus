@@ -83,6 +83,7 @@ namespace AutoNexus.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitCreationForm(VehicleFormViewModel viewModel)
         {
+            ValidateYear(viewModel);
             if (ModelState.IsValid)
             {
                 await PersistNewVehicleAsync(viewModel);
@@ -91,6 +92,13 @@ namespace AutoNexus.Web.Controllers
 
             VehicleFormViewModel reloadedViewModel = await ReloadFormWithErrorsAsync(viewModel);
             return View("CreationForm", reloadedViewModel);
+        }
+
+        private void ValidateYear(VehicleFormViewModel viewModel)
+        {
+            int maxYear = DateTime.Now.Year + 1;
+            if (viewModel.Year < 1900 || viewModel.Year > maxYear)
+                ModelState.AddModelError("Year", $"O ano deve ser entre 1900 e {maxYear}.");
         }
 
         private async Task PersistNewVehicleAsync(VehicleFormViewModel viewModel)
@@ -135,7 +143,7 @@ namespace AutoNexus.Web.Controllers
         public async Task<IActionResult> SubmitEditionForm(int id, VehicleFormViewModel viewModel)
         {
             if (id != viewModel.Id) return NotFound();
-
+            ValidateYear(viewModel);
             if (ModelState.IsValid)
             {
                 try
@@ -346,39 +354,6 @@ namespace AutoNexus.Web.Controllers
                 _ => VehicleType.Other
             };
         }
-        private async Task<JsonResult> FetchModelsFromFipeApi(string brandName)
-        {
-            string cleanBrandName = brandName?.Trim() ?? string.Empty;
-
-            if (string.IsNullOrEmpty(cleanBrandName))
-                return Json(new List<object>());
-
-            IEnumerable<FipeReferenceResponse> fipeBrands = await _fipeService.GetBrandsAsync();
-            FipeReferenceResponse? selectedFipeBrand = NewMethod(cleanBrandName, fipeBrands);
-
-            if (selectedFipeBrand != null)
-            {
-                string brandCode = selectedFipeBrand.Code.ToString()!;
-                IEnumerable<FipeReferenceResponse> models = await _fipeService.GetModelsAsync(brandCode);
-                return Json(models.OrderBy(m => m.Name));
-            }
-
-            return Json(new List<object>());
-        }
-
-        private static FipeReferenceResponse? NewMethod(string cleanBrandName, IEnumerable<FipeReferenceResponse> fipeBrands)
-        {
-            return fipeBrands.FirstOrDefault(b =>
-            {
-                string fipeName = b.Name.Trim();
-                bool exactMatch = string.Equals(fipeName, cleanBrandName, StringComparison.CurrentCultureIgnoreCase);
-                bool containsMatch = fipeName.IndexOf(cleanBrandName, StringComparison.CurrentCultureIgnoreCase) >= 0;
-                bool reverseContains = cleanBrandName.IndexOf(fipeName, StringComparison.CurrentCultureIgnoreCase) >= 0;
-
-                return exactMatch || containsMatch || reverseContains;
-            });
-        }
-
         private async Task<VehicleFormViewModel> PrepareEmptyFormAsync()
         {
             return new VehicleFormViewModel
