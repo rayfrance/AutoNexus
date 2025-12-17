@@ -47,6 +47,22 @@
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
 
+                <div class="mb-3">
+                    <label asp-for="Type" class="form-label">Tipo de Veículo</label>
+                    <select asp-for="Type" class="form-select"
+                            asp-items="Html.GetEnumSelectList<AutoNexus.Domain.Enums.VehicleType>()">
+                        <option value="">-- Selecione o Tipo --</option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Descrição (Opcional)</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" maxlength="500"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                    <div class="form-text">Máximo de 500 caracteres.</div>
+                </div>
+
                 <div class="mt-4">
                     <button type="submit" class="btn btn-success">
                         <i class="bi bi-check-circle"></i> Salvar Veículo
