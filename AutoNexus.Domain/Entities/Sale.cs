@@ -1,15 +1,18 @@
 ﻿using AutoNexus.Domain.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace AutoNexus.Domain.Entities
 {
     public class Sale : BaseEntity
     {
-        public DateTime SaleDate { get; set; } = DateTime.UtcNow;
-        public string ProtocolNumber { get; set; } = string.Empty; // Ex: 202310-ABCD
-        public decimal FinalPrice { get; set; }
-        public int ClientId { get; set; }
-        public Client Client { get; set; } = null!;
         public int VehicleId { get; set; }
-        public Vehicle Vehicle { get; set; } = null!;
+        public virtual Vehicle Vehicle { get; set; } = null!;
+
+        public int ClientId { get; set; }
+        public virtual Client Client { get; set; } = null!;
+
+        public DateTime SaleDate { get; set; }
+        public decimal SalePrice { get; set; }
+        public string ProtocolNumber { get; set; } = string.Empty;
     }
 }

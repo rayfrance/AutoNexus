@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using AutoNexus.Domain;
-using AutoNexus.Domain.Entities; // Adicionado para Vehicle/Manufacturer
-using AutoNexus.Domain.Enums;    // Adicionado para VehicleStatus
+using AutoNexus.Domain.Entities; 
+using AutoNexus.Domain.Enums;    
 
 namespace AutoNexus.Infrastructure.Data
 {
@@ -12,7 +12,7 @@ namespace AutoNexus.Infrastructure.Data
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var context = serviceProvider.GetRequiredService<ApplicationDbContext>(); // <--- NOVO
+            var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
             await SeedIdentitiesAsync(userManager, roleManager);
             await SeedVehiclesAsync(context);
