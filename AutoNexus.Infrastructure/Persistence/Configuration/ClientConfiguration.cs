@@ -8,11 +8,11 @@ namespace AutoNexus.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Client> builder)
         {
-            builder.Property(c => c.Name).IsRequired().HasMaxLength(200);
-            builder.Property(c => c.Email).IsRequired().HasMaxLength(150);
-            builder.Property(c => c.CPF).IsRequired().HasMaxLength(14); // 111.222.333-44
-            builder.Property(c => c.Phone).HasMaxLength(20);
-            builder.Property(c => c.ZipCode).HasMaxLength(10);
+            builder.HasIndex(c => c.CPF)
+                .IsUnique();
+            builder.Property(c => c.Name).HasMaxLength(100).IsRequired();
+            builder.Property(c => c.CPF).HasMaxLength(14).IsRequired();
+            builder.Property(c => c.Phone).HasMaxLength(20).IsRequired();
         }
     }
 }

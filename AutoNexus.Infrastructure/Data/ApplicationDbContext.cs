@@ -17,7 +17,12 @@ namespace AutoNexus.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+            modelBuilder.Entity<Sale>()
+                .HasIndex(s => s.ProtocolNumber)
+                .IsUnique();
+            modelBuilder.Entity<Sale>().HasQueryFilter(s => !s.IsDeleted);
         }
     }
 }

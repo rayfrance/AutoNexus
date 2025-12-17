@@ -1,7 +1,9 @@
 ﻿using AutoNexus.Application.Interfaces;
+using AutoNexus.Domain;
 using AutoNexus.Infrastructure.Data;
 using AutoNexus.Infrastructure.ExternalServices;
 using AutoNexus.Infrastructure.Persistence.Interceptors;
+using AutoNexus.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,9 +26,11 @@ namespace AutoNexus.Infrastructure
 
             services.AddHttpClient<IFipeService, FipeService>(client =>
             {
-                client.BaseAddress = new Uri("https://parallelum.com.br/fipe/api/v1/");
+                client.BaseAddress = new Uri(Constants.FIPE_URL);
             });
             services.AddHttpClient<IAddressService, ViaCepService>();
+
+            services.AddScoped<ISaleService, SaleService>();
 
             return services;
         }

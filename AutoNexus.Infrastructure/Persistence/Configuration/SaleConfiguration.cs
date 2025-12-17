@@ -8,15 +8,21 @@ namespace AutoNexus.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Sale> builder)
         {
-            builder.Property(s => s.ProtocolNumber).IsRequired().HasMaxLength(50);
+            builder.Property(s => s.ProtocolNumber)
+                .IsRequired()
+                .HasMaxLength(50);
 
-            builder.Property(s => s.FinalPrice)
-                .HasColumnType("decimal(18,2)");
+            builder.HasIndex(s => s.ProtocolNumber)
+                .IsUnique();
+
+            builder.Property(s => s.SalePrice)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
 
             builder.HasOne(s => s.Client)
                 .WithMany(c => c.Purchases)
                 .HasForeignKey(s => s.ClientId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict); 
 
             builder.HasOne(s => s.Vehicle)
                 .WithMany()
