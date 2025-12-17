@@ -3,9 +3,11 @@ using AutoNexus.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using AutoNexus.Application.DTOs.Sales;
 using AutoNexus.Domain;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AutoNexus.Web.Controllers
 {
+    [Authorize]
     public class SaleController : Controller
     {
         private readonly ISaleService _saleService;

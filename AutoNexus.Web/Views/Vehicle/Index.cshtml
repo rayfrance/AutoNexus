@@ -1,5 +1,6 @@
 ﻿@model AutoNexus.Application.Common.PaginatedList<AutoNexus.Domain.Entities.Vehicle>
 @using AutoNexus.Domain.Enums
+@using AutoNexus.Domain
 
 @{
     ViewData["Title"] = "Veículos";
@@ -12,9 +13,14 @@
         <h2 class="mb-0"><i class="bi bi-car-front-fill"></i> Veículos</h2>
         <small class="text-muted">Gerencie o estoque da revenda</small>
     </div>
-    <a asp-action="Create" class="btn btn-primary shadow-sm">
-        <i class="bi bi-plus-lg"></i> Novo Veículo
-    </a>
+
+    @* Apenas Admin pode ver o botão de criação *@
+    @if (User.IsInRole(Constants.ADMIN_ROLE))
+    {
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-lg"></i> Novo Veículo
+        </a>
+    }
 </div>
 
 <div class="card p-3 mb-4 shadow-sm border-0 bg-light">
@@ -53,7 +59,10 @@
                             <td colspan="6" class="text-center py-5 text-muted">
                                 <i class="bi bi-car-front display-6"></i>
                                 <p class="mt-2">Nenhum veículo encontrado no estoque.</p>
-                                <a asp-action="Create" class="btn btn-sm btn-outline-primary">Cadastrar Agora</a>
+                                @if (User.IsInRole(Constants.ADMIN_ROLE))
+                                {
+                                    <a asp-action="Create" class="btn btn-sm btn-outline-primary">Cadastrar Agora</a>
+                                }
                             </td>
                         </tr>
                     }
@@ -63,9 +72,9 @@
                         {
                             string badgeClass = item.Status switch
                             {
-                                VehicleStatus.Available => "bg-success", // Verde
-                                VehicleStatus.Reserved => "bg-warning text-dark", // Amarelo
-                                VehicleStatus.Sold => "bg-secondary", // Cinza
+                                VehicleStatus.Available => "bg-success",
+                                VehicleStatus.Reserved => "bg-warning text-dark",
+                                VehicleStatus.Sold => "bg-secondary",
                                 _ => "bg-light text-dark"
                             };
 
@@ -79,12 +88,22 @@
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group" role="group">
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Editar">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Deletar">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
+                                        @* ANX-25: Ações restritas para Admin *@
+                                        @if (User.IsInRole(Constants.ADMIN_ROLE))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Deletar">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-muted border">
+                                                <i class="bi bi-lock"></i> Somente Leitura
+                                            </span>
+                                        }
                                     </div>
                                 </td>
                             </tr>

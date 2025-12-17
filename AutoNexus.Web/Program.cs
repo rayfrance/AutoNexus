@@ -33,11 +33,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapRazorPages(); 
+app.MapDefaultControllerRoute(); 
 app.MapStaticAssets();
-app.MapRazorPages().WithStaticAssets();
+
+
+
 
 using (var scope = app.Services.CreateScope())
 {

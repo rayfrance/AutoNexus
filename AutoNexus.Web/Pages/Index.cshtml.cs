@@ -1,19 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace AutoNexus.Web.Pages;
-
-public class IndexModel : PageModel
+namespace AutoNexus.Web.Pages
 {
-    private readonly ILogger<IndexModel> _logger;
-
-    public IndexModel(ILogger<IndexModel> logger)
+    public class IndexModel : PageModel
     {
-        _logger = logger;
-    }
+        public IActionResult OnGet()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
 
-    public void OnGet()
-    {
-
+            return Page();
+        }
     }
 }
