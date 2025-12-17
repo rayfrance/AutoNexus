@@ -1,4 +1,5 @@
 ﻿using AutoNexus.Application.Common;
+using AutoNexus.Application.Common.Validation;
 using AutoNexus.Application.DTOs.Sales;
 using AutoNexus.Application.Interfaces;
 using AutoNexus.Domain.Entities;
@@ -17,6 +18,8 @@ namespace AutoNexus.Infrastructure.Services
             _context = context;
         }
 
+        #region Public Methods (Interface Implementation)
+
         public async Task<IEnumerable<Vehicle>> GetAvailableVehiclesAsync()
         {
             return await _context.Vehicles
@@ -26,25 +29,17 @@ namespace AutoNexus.Infrastructure.Services
                 .ToListAsync();
         }
 
-        public async Task ProcessSaleAsync(CreateSaleDto dto)
-        {
-            var vehicle = await ValidateAndGetVehicleAsync(dto);
-            ValidateSaleRules(dto);
-
-            var client = await GetOrCreateClientAsync(dto);
-
-            await ExecuteSaleTransactionAsync(vehicle, client, dto);
-        }
         public async Task<IEnumerable<Sale>> GetAllSalesAsync()
         {
             return await _context.Sales
-                .AsNoTracking() 
+                .AsNoTracking()
                 .Include(s => s.Client)
                 .Include(s => s.Vehicle)
-                .ThenInclude(v => v.Manufacturer) 
-                .OrderByDescending(s => s.SaleDate) 
+                .ThenInclude(v => v.Manufacturer)
+                .OrderByDescending(s => s.SaleDate)
                 .ToListAsync();
         }
+
         public async Task<PaginatedList<Sale>> SearchSalesAsync(string searchString, int pageNumber, int pageSize)
         {
             var query = _context.Sales
@@ -66,7 +61,28 @@ namespace AutoNexus.Infrastructure.Services
 
             return await PaginatedList<Sale>.CreateAsync(query, pageNumber, pageSize);
         }
+
+        public async Task<Client?> GetClientByCpfAsync(string cpf)
+        {
+            var cleanCpf = CpfValidator.GetOnlyNumbers(cpf);
+            return await _context.Clients.FirstOrDefaultAsync(c => c.CPF == cleanCpf);
+        }
+
+        public async Task ProcessSaleAsync(CreateSaleDto dto)
+        {
+            dto.ClientCPF = CpfValidator.GetOnlyNumbers(dto.ClientCPF);
+
+            var vehicle = await ValidateAndGetVehicleAsync(dto);
+            ValidateSaleRules(dto);
+            var client = await GetOrCreateClientAsync(dto);
+
+            await ExecuteSaleTransactionAsync(vehicle, client, dto);
+        }
+
+        #endregion
+
         #region Private Helper Methods
+
         private async Task<Vehicle> ValidateAndGetVehicleAsync(CreateSaleDto dto)
         {
             var vehicle = await _context.Vehicles.FindAsync(dto.VehicleId);
@@ -91,33 +107,34 @@ namespace AutoNexus.Infrastructure.Services
 
         private async Task<Client> GetOrCreateClientAsync(CreateSaleDto dto)
         {
-            var client = await _context.Clients.FirstOrDefaultAsync(c => c.CPF == dto.ClientCPF);
+            var cleanCpf = CpfValidator.GetOnlyNumbers(dto.ClientCPF);
+
+            var client = await _context.Clients.FirstOrDefaultAsync(c => c.CPF == cleanCpf);
 
             if (client == null)
-                client = CreateClient(dto);
+            {
+                client = await CreateClient(dto, cleanCpf);
+            }
             else
-                UpdateClient(dto, client);
+            {
+                client.Name = dto.ClientName;
+                client.Phone = dto.ClientPhone;
+                _context.Clients.Update(client);
+            }
 
             return client;
         }
 
-        private void UpdateClient(CreateSaleDto dto, Client client)
-        {
-            client.Name = dto.ClientName;
-            client.Phone = dto.ClientPhone;
-            _context.Clients.Update(client);
-        }
-
-        private Client CreateClient(CreateSaleDto dto)
+        private async Task<Client> CreateClient(CreateSaleDto dto, string cleanCpf)
         {
             Client client = new Client
             {
                 Name = dto.ClientName,
-                CPF = dto.ClientCPF,
+                CPF = cleanCpf,
                 Phone = dto.ClientPhone,
                 CreatedAt = DateTime.UtcNow
             };
-            _context.Clients.Add(client);
+            await _context.Clients.AddAsync(client);
             return client;
         }
 

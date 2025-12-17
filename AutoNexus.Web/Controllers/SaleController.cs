@@ -15,7 +15,7 @@ namespace AutoNexus.Web.Controllers
             _saleService = saleService;
         }
 
-        #region 1. LEITURA 
+        #region 1. LEITURA (Index)
 
         [HttpGet]
         public async Task<IActionResult> Index(string searchString, int? pageNumber)
@@ -29,7 +29,7 @@ namespace AutoNexus.Web.Controllers
 
         #endregion
 
-        #region 2. CRIAÇÃO 
+        #region 2. CRIAÇÃO (Create)
 
         [HttpGet]
         [ActionName("Create")]
@@ -74,11 +74,30 @@ namespace AutoNexus.Web.Controllers
 
         #endregion
 
-        #region 3. MÉTODOS AUXILIARES 
+        #region 3. API / AJAX (Novos Métodos para o Front-end)
 
         /// <summary>
-        /// Cria um ViewModel novo e carrega a lista de carros disponíveis.
+        /// Endpoint chamado pelo JavaScript para buscar dados do cliente pelo CPF
         /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> SearchClient(string cpf)
+        {
+            if (string.IsNullOrWhiteSpace(cpf))
+                return BadRequest("CPF inválido.");
+
+            var client = await _saleService.GetClientByCpfAsync(cpf);
+
+            if (client == null)
+            {
+                return NotFound();             }
+
+            return Json(new { name = client.Name, phone = client.Phone });
+        }
+
+        #endregion
+
+        #region 4. MÉTODOS AUXILIARES (Helpers)
+
         private async Task<SaleFormViewModel> PrepareEmptyFormAsync()
         {
             return new SaleFormViewModel
@@ -88,9 +107,6 @@ namespace AutoNexus.Web.Controllers
             };
         }
 
-        /// <summary>
-        /// Recarrega apenas os dados do banco (Dropdowns) em caso de erro de validação.
-        /// </summary>
         private async Task<SaleFormViewModel> ReloadFormWithErrorsAsync(SaleFormViewModel viewModel)
         {
             viewModel.AvailableVehicles = await _saleService.GetAvailableVehiclesAsync();

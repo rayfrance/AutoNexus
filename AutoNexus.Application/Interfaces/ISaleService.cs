@@ -8,6 +8,7 @@ namespace AutoNexus.Application.Interfaces
     {
         Task<IEnumerable<Vehicle>> GetAvailableVehiclesAsync();
         Task ProcessSaleAsync(CreateSaleDto dto);
+        Task<Client?> GetClientByCpfAsync(string cpf);
         Task<PaginatedList<Sale>> SearchSalesAsync(string searchString, int pageNumber, int pageSize);
     }
 }
