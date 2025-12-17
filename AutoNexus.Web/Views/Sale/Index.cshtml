@@ -1,19 +1,19 @@
-﻿@model AutoNexus.Application.Common.PaginatedList<AutoNexus.Domain.Entities.Vehicle>
-@using AutoNexus.Domain.Enums
+﻿@using AutoNexus.Domain.Entities
+@model AutoNexus.Application.Common.PaginatedList<Sale>
 
 @{
-    ViewData["Title"] = "Veículos";
+    ViewData["Title"] = "Histórico de Vendas";
     Layout = "~/Pages/Shared/_Layout.cshtml";
     string? currentFilter = ViewData["CurrentFilter"] as string;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-0"><i class="bi bi-car-front-fill"></i> Veículos</h2>
-        <small class="text-muted">Gerencie o estoque da revenda</small>
+        <h2 class="mb-0"><i class="bi bi-receipt"></i> Histórico de Vendas</h2>
+        <small class="text-muted">Gerencie recibos e consulte transações</small>
     </div>
-    <a asp-action="Create" class="btn btn-primary shadow-sm">
-        <i class="bi bi-plus-lg"></i> Novo Veículo
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-cart-plus"></i> Nova Venda
     </a>
 </div>
 
@@ -23,7 +23,7 @@
             <div class="input-group">
                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
                 <input type="text" name="searchString" value="@currentFilter" class="form-control border-start-0 ps-0"
-                       placeholder="Buscar por modelo ou fabricante..." />
+                       placeholder="Buscar por protocolo, cliente ou modelo..." />
             </div>
         </div>
         <div class="col-md-2">
@@ -38,11 +38,11 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-4">Modelo</th>
-                        <th>Fabricante</th>
-                        <th>Ano</th>
-                        <th>Preço</th>
-                        <th>Status</th>
+                        <th class="ps-4">Protocolo</th>
+                        <th>Veículo</th>
+                        <th>Cliente</th>
+                        <th>Data</th>
+                        <th>Valor</th>
                         <th class="text-end pe-4">Ações</th>
                     </tr>
                 </thead>
@@ -51,9 +51,8 @@
                     {
                         <tr>
                             <td colspan="6" class="text-center py-5 text-muted">
-                                <i class="bi bi-car-front display-6"></i>
-                                <p class="mt-2">Nenhum veículo encontrado no estoque.</p>
-                                <a asp-action="Create" class="btn btn-sm btn-outline-primary">Cadastrar Agora</a>
+                                <i class="bi bi-inbox display-6"></i>
+                                <p class="mt-2">Nenhuma venda encontrada.</p>
                             </td>
                         </tr>
                     }
@@ -61,30 +60,29 @@
                     {
                         @foreach (var item in Model)
                         {
-                            string badgeClass = item.Status switch
-                            {
-                                VehicleStatus.Available => "bg-success", // Verde
-                                VehicleStatus.Reserved => "bg-warning text-dark", // Amarelo
-                                VehicleStatus.Sold => "bg-secondary", // Cinza
-                                _ => "bg-light text-dark"
-                            };
-
                             <tr>
-                                <td class="ps-4 fw-bold">@item.Model</td>
-                                <td>@item.Manufacturer.Name</td>
-                                <td>@item.Year</td>
-                                <td class="fw-bold text-primary">@item.Price.ToString("C")</td>
-                                <td>
-                                    <span class="badge @badgeClass">@item.Status</span>
+                                <td class="ps-4">
+                                    <span class="badge bg-secondary font-monospace">@item.ProtocolNumber</span>
                                 </td>
+                                <td>
+                                    <strong>@item.Vehicle?.Model</strong><br />
+                                    <small class="text-muted">@item.Vehicle?.Manufacturer?.Name</small>
+                                </td>
+                                <td>
+                                    @item.Client?.Name<br />
+                                    <small class="text-muted">@item.Client?.CPF</small>
+                                </td>
+                                <td>@item.SaleDate.ToString("dd/MM/yyyy")</td>
+                                <td class="fw-bold text-success">@item.SalePrice.ToString("C")</td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group" role="group">
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Editar">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Deletar">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
+                                        <button class="btn btn-sm btn-outline-primary" title="Ver Recibo" disabled>
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-danger" title="Cancelar/Estornar" disabled>
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

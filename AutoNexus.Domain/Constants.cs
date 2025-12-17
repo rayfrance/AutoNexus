@@ -26,5 +26,9 @@ namespace AutoNexus.Domain
         public const string FIPE_URL = "https://parallelum.com.br/fipe/api/v1/carros";
         public const string VIACEP_URL = "https://viacep.com.br/ws";
         #endregion
+
+        #region Pagination
+        public const int DEFAULT_PAGE_SIZE = 5;
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using AutoNexus.Application.DTOs.Sales;
+﻿using AutoNexus.Application.Common;
+using AutoNexus.Application.DTOs.Sales;
 using AutoNexus.Application.Interfaces;
 using AutoNexus.Domain.Entities;
 using AutoNexus.Domain.Enums;
@@ -34,7 +35,37 @@ namespace AutoNexus.Infrastructure.Services
 
             await ExecuteSaleTransactionAsync(vehicle, client, dto);
         }
+        public async Task<IEnumerable<Sale>> GetAllSalesAsync()
+        {
+            return await _context.Sales
+                .AsNoTracking() 
+                .Include(s => s.Client)
+                .Include(s => s.Vehicle)
+                .ThenInclude(v => v.Manufacturer) 
+                .OrderByDescending(s => s.SaleDate) 
+                .ToListAsync();
+        }
+        public async Task<PaginatedList<Sale>> SearchSalesAsync(string searchString, int pageNumber, int pageSize)
+        {
+            var query = _context.Sales
+                .AsNoTracking()
+                .Include(s => s.Client)
+                .Include(s => s.Vehicle)
+                .ThenInclude(v => v.Manufacturer)
+                .AsQueryable();
 
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(s =>
+                    s.ProtocolNumber.Contains(searchString) ||
+                    s.Client.Name.Contains(searchString) ||
+                    s.Vehicle.Model.Contains(searchString)
+                );
+            }
+            query = query.OrderByDescending(s => s.SaleDate);
+
+            return await PaginatedList<Sale>.CreateAsync(query, pageNumber, pageSize);
+        }
         #region Private Helper Methods
         private async Task<Vehicle> ValidateAndGetVehicleAsync(CreateSaleDto dto)
         {
@@ -111,8 +142,7 @@ namespace AutoNexus.Infrastructure.Services
 
         private string GenerateUniqueProtocol()
         {
-            // Ex: VENDA-20251217-ABCD
-            return $"VENDA-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString()[..4].ToUpper()}";
+            return $"{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString()[..4].ToUpper()}";
         }
 
         #endregion
