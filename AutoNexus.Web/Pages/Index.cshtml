@@ -1,10 +1,105 @@
-﻿@page
-@model IndexModel
+﻿@page "/"
+@model AutoNexus.Web.Pages.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Bem-vindo ao AutoNexus</h1>
-    <p>Sistema de Gerenciamento de Veículos.</p>
+<div class="container-fluid mt-4 px-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold"><i class="bi bi-grid-1x2-fill me-2"></i>Dashboard Administrativo</h2>
+            <p class="text-muted">Bem-vindo ao painel de controle da AutoNexus.</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm bg-primary text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1 opacity-75 small">Total em Vendas</h6>
+                        <h3 class="fw-bold mb-0">R$ 0,00</h3>
+                    </div>
+                    <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
+                </div>
+                <div class="mt-3 small opacity-75">Baseado em 0 vendas este mês</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm bg-success text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1 opacity-75 small">Veículos no Pátio</h6>
+                        <h3 class="fw-bold mb-0">0</h3>
+                    </div>
+                    <i class="bi bi-car-front-fill fs-1 opacity-50"></i>
+                </div>
+                <div class="mt-3 small opacity-75">Status: Disponível</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm bg-warning text-dark p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1 opacity-75 small">Ticket Médio</h6>
+                        <h3 class="fw-bold mb-0">R$ 0,00</h3>
+                    </div>
+                    <i class="bi bi-graph-up-arrow fs-1 opacity-50"></i>
+                </div>
+                <div class="mt-3 small opacity-75">Média por venda realizada</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm bg-info text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1 opacity-75 small">Clientes Ativos</h6>
+                        <h3 class="fw-bold mb-0">0</h3>
+                    </div>
+                    <i class="bi bi-people-fill fs-1 opacity-50"></i>
+                </div>
+                <div class="mt-3 small opacity-75">Base de CPFs únicos</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold text-secondary">Vendas Recentes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-light text-center py-5">
+                        <i class="bi bi-clipboard-data fs-1 text-muted"></i>
+                        <p class="mt-2 text-muted">Nenhuma transação registrada hoje.</p>
+                        @* Adicionado asp-area="" para garantir a rota correta fora da pasta Pages *@
+                        <a asp-area="" asp-controller="Sale" asp-action="Create" class="btn btn-sm btn-outline-primary">Lançar Nova Venda</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold text-secondary">Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a asp-area="" asp-controller="Sale" asp-action="Create" class="btn btn-outline-success p-3 text-start shadow-none">
+                            <i class="bi bi-cart-plus me-2"></i> Registrar Venda
+                        </a>
+                        <a asp-area="" asp-controller="Vehicle" asp-action="Create" class="btn btn-outline-primary p-3 text-start shadow-none">
+                            <i class="bi bi-plus-circle me-2"></i> Adicionar Veículo
+                        </a>
+                        <a asp-area="" asp-controller="Vehicle" asp-action="Index" class="btn btn-outline-secondary p-3 text-start shadow-none">
+                            <i class="bi bi-search me-2"></i> Consultar Estoque
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

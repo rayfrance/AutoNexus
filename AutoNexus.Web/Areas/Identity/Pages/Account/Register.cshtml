@@ -1,5 +1,6 @@
 ﻿@page
 @model RegisterModel
+@using AutoNexus.Domain
 @{
     ViewData["Title"] = "Registrar";
     Layout = "/Pages/Shared/_Layout.cshtml";
@@ -7,8 +8,7 @@
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-
+        <div class="col-md-5 col-lg-4">
             <div class="card card-login shadow-lg">
                 <div class="card-header-custom text-center">
                     <h3 class="fw-bold mb-0">Nova Conta</h3>
@@ -25,6 +25,16 @@
                             <span asp-validation-for="Input.Email" class="text-danger small"></span>
                         </div>
 
+                        <div class="form-floating mb-3">
+                            <select asp-for="Input.Role" class="form-select">
+                                <option value="" disabled selected>Escolha um cargo...</option>
+                                <option value="@Constants.ADMIN_ROLE">Administrador / Gerente</option>
+                                <option value="@Constants.SELLER_ROLE">Vendedor / Comercial</option>
+                            </select>
+                            <label asp-for="Input.Role">Perfil de Acesso</label>
+                            <span asp-validation-for="Input.Role" class="text-danger small"></span>
+                        </div>
+
                         <div class="row g-2 mb-3">
                             <div class="col-md-6">
                                 <div class="form-floating">
@@ -38,10 +48,6 @@
                                     <label asp-for="Input.ConfirmPassword">Confirmar</label>
                                 </div>
                             </div>
-                            <div class="col-12">
-                                <span asp-validation-for="Input.Password" class="text-danger small d-block"></span>
-                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger small d-block"></span>
-                            </div>
                         </div>
 
                         <div class="d-grid gap-2">
@@ -49,10 +55,7 @@
                         </div>
 
                         <div class="text-center mt-4">
-                            <p class="mb-0 text-muted small">Já é cadastrado?</p>
-                            <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="fw-bold">
-                                Fazer Login
-                            </a>
+                            <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="fw-bold">Fazer Login</a>
                         </div>
                     </form>
                 </div>
@@ -60,7 +63,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

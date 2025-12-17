@@ -16,6 +16,19 @@ html, body {
     height: 100%;
     margin: 0;
 }
+/* Centraliza o card de login quando a navbar estiver ausente */
+body:not(:has(header)) {
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+body:not(:has(header)) .card-login {
+    width: 100%;
+    max-width: 400px;
+}
 
 body {
     background-color: #f8f9fa; /* Bootstrap bg-light */

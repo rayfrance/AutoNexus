@@ -8,9 +8,11 @@ using AutoNexus.Infrastructure.Data;
 using AutoNexus.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AutoNexus.Web.Controllers
 {
+    [Authorize]
     public class VehicleController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -68,10 +70,11 @@ namespace AutoNexus.Web.Controllers
 
         #endregion
 
-        #region 2. CRIAÇÃO (Create)
+        #region 2. CRIAÇÃO (Create) - PROTEGIDO (ADMIN)
 
         [HttpGet]
         [ActionName("Create")]
+        [Authorize(Roles = Constants.ADMIN_ROLE)]
         public async Task<IActionResult> OpenCreationForm()
         {
             VehicleFormViewModel viewModel = await PrepareEmptyFormAsync();
@@ -81,6 +84,7 @@ namespace AutoNexus.Web.Controllers
         [HttpPost]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = Constants.ADMIN_ROLE)]
         public async Task<IActionResult> SubmitCreationForm(VehicleFormViewModel viewModel)
         {
             ValidateYear(viewModel);
@@ -121,10 +125,11 @@ namespace AutoNexus.Web.Controllers
 
         #endregion
 
-        #region 3. EDIÇÃO (Edit)
+        #region 3. EDIÇÃO (Edit) - PROTEGIDO (ADMIN)
 
         [HttpGet]
         [ActionName("Edit")]
+        [Authorize(Roles = Constants.ADMIN_ROLE)]
         public async Task<IActionResult> OpenEditionForm(int? id)
         {
             if (id == null) return NotFound();
@@ -140,6 +145,7 @@ namespace AutoNexus.Web.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = Constants.ADMIN_ROLE)]
         public async Task<IActionResult> SubmitEditionForm(int id, VehicleFormViewModel viewModel)
         {
             if (id != viewModel.Id) return NotFound();
@@ -197,10 +203,11 @@ namespace AutoNexus.Web.Controllers
 
         #endregion
 
-        #region 4. DELEÇÃO (Delete)
+        #region 4. DELEÇÃO (Delete) - PROTEGIDO (ADMIN)
 
         [HttpGet]
         [ActionName("Delete")]
+        [Authorize(Roles = Constants.ADMIN_ROLE)]
         public async Task<IActionResult> OpenDeleteConfirmation(int? id)
         {
             if (id == null) return NotFound();
@@ -217,6 +224,7 @@ namespace AutoNexus.Web.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = Constants.ADMIN_ROLE)]
         public async Task<IActionResult> SubmitDeleteConfirmation(int id)
         {
             Vehicle? vehicle = await _context.Vehicles.FindAsync(id);
@@ -260,6 +268,7 @@ namespace AutoNexus.Web.Controllers
                 return Json(new List<object> { new { name = $"ERRO: {ex.Message}", code = "" } });
             }
         }
+
         [HttpGet]
         public async Task<JsonResult> GetYearsByModel(int manufacturerId, string modelId)
         {
@@ -354,6 +363,7 @@ namespace AutoNexus.Web.Controllers
                 _ => VehicleType.Other
             };
         }
+
         private async Task<VehicleFormViewModel> PrepareEmptyFormAsync()
         {
             return new VehicleFormViewModel
