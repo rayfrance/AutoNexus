@@ -1,4 +1,5 @@
-﻿using AutoNexus.Domain.Entities;
+﻿using AutoNexus.Application.Common.Validation;
+using AutoNexus.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace AutoNexus.Web.Models
@@ -24,6 +25,7 @@ namespace AutoNexus.Web.Models
 
         [Required(ErrorMessage = "O CPF é obrigatório.")]
         [Display(Name = "CPF")]
+        [Cpf(ErrorMessage = "CPF inválido. Verifique os dígitos.")]
         public string ClientCPF { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "O telefone é obrigatório.")]

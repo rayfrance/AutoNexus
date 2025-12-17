@@ -61,42 +61,46 @@
 
                 <h5 class="text-secondary mb-3"><i class="bi bi-person-vcard"></i> Dados do Cliente</h5>
 
-                <div class="mb-3">
-                    <label asp-for="ClientName" class="form-label fw-bold">Nome Completo</label>
-                    <input asp-for="ClientName" class="form-control" placeholder="Ex: João da Silva" />
-                    <span asp-validation-for="ClientName" class="text-danger"></span>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
+                <div class="row mb-3">
+                    <div class="col-md-6">
                         <label asp-for="ClientCPF" class="form-label fw-bold">CPF</label>
-                        <input asp-for="ClientCPF" class="form-control" placeholder="000.000.000-00" />
+                        <input asp-for="ClientCPF" id="ClientCPF" class="form-control" placeholder="000.000.000-00" />
                         <span asp-validation-for="ClientCPF" class="text-danger"></span>
+                        <small class="text-muted d-none" id="searchingCpfText">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Buscando cliente...
+                        </small>
                     </div>
 
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6">
                         <label asp-for="ClientPhone" class="form-label fw-bold">Telefone</label>
-                        <input asp-for="ClientPhone" class="form-control" placeholder="(00) 00000-0000" />
+                        <input asp-for="ClientPhone" id="ClientPhone" class="form-control" placeholder="(00) 00000-0000" />
                         <span asp-validation-for="ClientPhone" class="text-danger"></span>
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label asp-for="ClientName" class="form-label fw-bold">Nome Completo</label>
+                    <input asp-for="ClientName" id="ClientName" class="form-control" placeholder="Ex: João da Silva" />
+                    <span asp-validation-for="ClientName" class="text-danger"></span>
+                </div>
+
                 <div class="mt-4">
-                    <button type="submit" class="btn btn-success btn-lg">
+                    <button type="submit" class="btn btn-success btn-lg shadow-sm">
                         <i class="bi bi-check-lg"></i> Finalizar Venda
                     </button>
-                    <a asp-controller="Vehicle" asp-action="Index" class="btn btn-secondary btn-lg">Voltar</a>
+                    <a asp-controller="Vehicle" asp-action="Index" class="btn btn-secondary btn-lg shadow-sm">Voltar</a>
                 </div>
             </form>
         </div>
 
         <div class="col-md-4 d-none d-md-block">
-            <div class="alert alert-info">
+            <div class="alert alert-info shadow-sm">
                 <h5><i class="bi bi-info-circle"></i> Processo de Venda</h5>
                 <p class="small">
                     1. <strong>Selecione o Veículo:</strong> A lista exibe apenas carros com status "Disponível".<br>
                     2. <strong>Verifique o Preço:</strong> O valor da venda não pode ultrapassar a tabela do veículo.<br>
-                    3. <strong>Dados do Cliente:</strong> O CPF é validado para garantir unicidade no cadastro.<br>
+                    3. <strong>Dados do Cliente:</strong> O CPF é validado. Se o cliente já existir, os dados serão carregados automaticamente.<br>
                     <br>
                     Ao finalizar, o veículo sairá automaticamente do estoque e um <strong>Protocolo Único</strong> será gerado.
                 </p>
@@ -115,7 +119,7 @@
 
     <script>
         $(document).ready(function() {
-            // Inicializa Select2 
+            // --- 1. Inicializa Select2 (Busca de Veículos) ---
             $('.select2').select2({
                 theme: 'bootstrap-5',
                 width: '100%',
@@ -123,23 +127,59 @@
                 allowClear: true
             });
 
-            // Elementos
+            // --- 2. Lógica de Preço do Veículo ---
             const $ddlVehicle = $('#ddlVehicle');
             const $helpText = $('#priceHelpText');
 
-            //  Atualizar Dica de Preço ao selecionar carro
             $ddlVehicle.on('change', function() {
-                // Pega a opção selecionada usando jQuery
                 const $selectedOption = $(this).find('option:selected');
-                const maxPrice = $selectedOption.data('price'); 
+                const maxPrice = $selectedOption.data('price');
 
                 if (maxPrice) {
-                    // Formata para BRL
                     const formatted = parseFloat(maxPrice.toString().replace(',', '.')).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
                     $helpText.html(`<i class="bi bi-tag-fill"></i> Tabela Máxima: <strong class="text-success">${formatted}</strong>`);
                 } else {
                     $helpText.text('Selecione um veículo para ver o teto de preço.');
+                }
+            });
+
+            // --- 3. Lógica de Busca Automática de Cliente (AJAX) ---
+            const $cpfInput = $('#ClientCPF');
+            const $nameInput = $('#ClientName');
+            const $phoneInput = $('#ClientPhone');
+            const $searchingText = $('#searchingCpfText');
+
+            $cpfInput.on('blur', function() {
+                const cpfValue = $(this).val();
+
+                if (cpfValue && cpfValue.length > 0) {
+
+                    $searchingText.removeClass('d-none');
+                    $nameInput.attr('placeholder', 'Buscando cadastro...');
+
+                    $.ajax({
+                        url: '/Sale/SearchClient',
+                        type: 'GET',
+                        data: { cpf: cpfValue },
+                        success: function(data) {
+                            $nameInput.val(data.name);
+                            $phoneInput.val(data.phone);
+
+                            $nameInput.addClass('is-valid');
+                            $phoneInput.addClass('is-valid');
+                            $cpfInput.addClass('is-valid');
+                        },
+                        error: function() {
+                            $nameInput.removeClass('is-valid');
+                            $phoneInput.removeClass('is-valid');
+                            $cpfInput.removeClass('is-valid');
+
+                            $nameInput.attr('placeholder', 'Ex: João da Silva');
+                        },
+                        complete: function() {
+                            $searchingText.addClass('d-none');
+                        }
+                    });
                 }
             });
         });
