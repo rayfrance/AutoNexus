@@ -149,3 +149,63 @@ a:hover {
     border-color: var(--anx-dark-blue);
     box-shadow: 0 4px 6px rgba(0,0,0,0.15);
 }
+/* Remove sublinhados e estiliza os botões de ação rápida */
+.quick-action-btn {
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+
+/* Efeito de hover: leve elevação e sombra, sem mudar drasticamente a cor */
+.quick-action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    background-color: #f8f9fa;
+    text-decoration: none !important;
+}
+
+/* Garante que o texto interno não mude de cor ou sublinhe */
+.quick-action-btn strong,
+.quick-action-btn small {
+    text-decoration: none !important;
+}
+
+/* Estilo específico para ícones para manter a cor do tema */
+.quick-action-btn i {
+    transition: transform 0.3s ease;
+}
+
+.quick-action-btn:hover i {
+    transform: scale(1.1);
+}
+
+
+/* Remove sublinhados e estiliza os botões de ação rápida */
+.quick-action-btn {
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+
+/* Efeito de hover: leve elevação e sombra, sem mudar drasticamente a cor */
+.quick-action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    background-color: #f8f9fa;
+    text-decoration: none !important;
+}
+
+/* Garante que o texto interno não mude de cor ou sublinhe */
+.quick-action-btn strong,
+.quick-action-btn small {
+    text-decoration: none !important;
+}
+
+/* Estilo específico para ícones para manter a cor do tema */
+.quick-action-btn i {
+    transition: transform 0.3s ease;
+}
+
+.quick-action-btn:hover i {
+    transform: scale(1.1);
+}
