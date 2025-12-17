@@ -22,7 +22,10 @@ namespace AutoNexus.Infrastructure
                        .AddInterceptors(interceptor);
             });
 
-            services.AddHttpClient<IFipeService, FipeService>();
+            services.AddHttpClient<IFipeService, FipeService>(client =>
+            {
+                client.BaseAddress = new Uri("https://parallelum.com.br/fipe/api/v1/");
+            });
             services.AddHttpClient<IAddressService, ViaCepService>();
 
             return services;

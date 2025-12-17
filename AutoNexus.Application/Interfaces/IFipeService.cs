@@ -6,5 +6,7 @@ namespace AutoNexus.Application.Interfaces
     {
         Task<IEnumerable<FipeReferenceResponse>> GetBrandsAsync();
         Task<IEnumerable<FipeReferenceResponse>> GetModelsAsync(string brandId);
+        Task<IEnumerable<FipeReferenceResponse>> GetYearsAsync(string brandId, string modelId);
+        Task<FipeVehicleResponse?> GetVehicleDetailsAsync(string brandId, string modelId, string yearId);
     }
 }

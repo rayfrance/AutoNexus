@@ -9,16 +9,19 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
 <div class="container mt-4 pb-5 mb-5">
-    <h2>Cadastrar Novo Veículo</h2>
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Cadastrar Novo Veículo</h2>
+        <span id="fipeStatusBadge" class="badge bg-info text-dark">Automação FIPE Ativa</span>
+    </div>
     <hr />
 
     <div class="row">
-        <div class="col-md-6">
-            <form asp-action="Create">
+        <div class="col-md-8">
+            <form asp-action="Create" id="createForm">
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                 <div class="mb-3">
-                    <label asp-for="ManufacturerId" class="form-label">Fabricante</label>
+                    <label asp-for="ManufacturerId" class="form-label fw-bold">Fabricante</label>
                     <select asp-for="ManufacturerId"
                             class="form-select select2"
                             asp-items="@(new SelectList(Model.Manufacturers, "Id", "Name"))">
@@ -28,48 +31,87 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Model" class="form-label">Modelo</label>
+                    <label asp-for="Model" class="form-label fw-bold">Modelo</label>
                     <select asp-for="Model" class="form-select select2" disabled>
                         <option value="">-- Selecione uma Marca primeiro --</option>
                     </select>
                     <span asp-validation-for="Model" class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Year" class="form-label">Ano</label>
-                    <input asp-for="Year" class="form-control" type="number" min="1900" max="2100" />
-                    <span asp-validation-for="Year" class="text-danger"></span>
+                <div class="d-flex justify-content-end mb-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="manualModeToggle">
+                        <label class="form-check-label fw-bold text-secondary" for="manualModeToggle">Ativar Modo Manual (Desligar FIPE)</label>
+                    </div>
+                </div>
+
+                <div id="fipeCard" class="card bg-light mb-3 border-secondary transition-opacity">
+                    <div class="card-body py-2">
+                        <label class="form-label text-primary fw-bold mb-1">
+                            <i class="bi bi-magic"></i> Versão Fipe (Preenchimento Automático)
+                        </label>
+                        <select id="FipeYearSelect" class="form-select select2" disabled>
+                            <option value="">-- Selecione o Modelo primeiro --</option>
+                        </select>
+                        <div class="form-text small text-muted">
+                            Selecione a versão exata para preencher Preço, Ano e Tipo automaticamente.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Year" class="form-label">Ano</label>
+                        <input asp-for="Year" class="form-control" type="number" min="1900" max="2100" />
+                        <span asp-validation-for="Year" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Price" class="form-label">Preço (R$)</label>
+                        <input asp-for="Price" class="form-control" type="text" placeholder="0,00" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Type" class="form-label">Tipo</label>
+                        <select asp-for="Type" class="form-select"
+                                asp-items="Html.GetEnumSelectList<AutoNexus.Domain.Enums.VehicleType>()">
+                            <option value="">-- Selecione --</option>
+                        </select>
+                        <span asp-validation-for="Type" class="text-danger"></span>
+                    </div>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Price" class="form-label">Preço (R$)</label>
-                    <input asp-for="Price" class="form-control" type="number" step="0.01" />
-                    <span asp-validation-for="Price" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Type" class="form-label">Tipo de Veículo</label>
-                    <select asp-for="Type" class="form-select"
-                            asp-items="Html.GetEnumSelectList<AutoNexus.Domain.Enums.VehicleType>()">
-                        <option value="">-- Selecione o Tipo --</option>
-                    </select>
-                    <span asp-validation-for="Type" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label">Descrição (Opcional)</label>
+                    <label asp-for="Description" class="form-label">Descrição</label>
                     <textarea asp-for="Description" class="form-control" rows="3" maxlength="500"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
-                    <div class="form-text">Máximo de 500 caracteres.</div>
                 </div>
 
                 <div class="mt-4">
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-success btn-lg">
                         <i class="bi bi-check-circle"></i> Salvar Veículo
                     </button>
-                    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">Voltar</a>
                 </div>
             </form>
+        </div>
+
+        <div class="col-md-4 d-none d-md-block">
+            <div class="alert alert-info">
+                <h5><i class="bi bi-info-circle"></i> Como funciona?</h5>
+                <p class="small">
+                    1. Escolha a <strong>Marca</strong>.<br>
+                    2. Escolha o <strong>Modelo</strong>.<br>
+                    3. Selecione a <strong>Versão Fipe</strong>.<br>
+                    <br>
+                    O sistema buscará automaticamente o preço médio de mercado e os detalhes técnicos.
+                </p>
+                <hr>
+                <p class="small text-muted">
+                    <i class="bi bi-toggle-on"></i> Use o botão "Modo Manual" se não encontrar seu veículo na tabela FIPE.
+                </p>
+            </div>
         </div>
     </div>
 </div>
@@ -84,69 +126,157 @@
 
     <script>
         $(document).ready(function() {
-            // Inicializa o Select2 com tema Bootstrap em todos os campos com a classe .select2
+
+            // Inicializa Select2
             $('.select2').select2({
                 theme: 'bootstrap-5',
                 width: '100%'
             });
 
-            // Referências aos campos via jQuery
-            const $manufacturer = $('#ManufacturerId');
-            const $model = $('#Model');
+            // Elementos jQuery
+            const $ddlManufacturer = $('#ManufacturerId');
+            const $ddlModel = $('#Model');
+            const $ddlFipeYear = $('#FipeYearSelect');
+            const $txtYear = $('#Year');
+            const $txtPrice = $('#Price');
+            const $ddlType = $('#Type');
+            const $txtDesc = $('#Description');
 
-            // 3. Evento de Mudança (Change)
-            $manufacturer.on('change', function () {
+            // Novos Elementos (Toggle e Badge)
+            const $toggleManual = $('#manualModeToggle');
+            const $badgeStatus = $('#fipeStatusBadge');
+            const $fipeCard = $('#fipeCard');
+
+            // --- LÓGICA 0: TOGGLE MODO MANUAL/AUTO ---
+            $toggleManual.change(function() {
+                const isManual = $(this).is(':checked');
+
+                if (isManual) {
+                    // ATIVA MODO MANUAL
+                    $fipeCard.addClass('opacity-50'); // Deixa transparente
+                    $ddlFipeYear.prop('disabled', true);
+
+                    // Atualiza Badge
+                    $badgeStatus.removeClass('bg-info text-dark').addClass('bg-secondary text-white').text('Modo Manual');
+
+                    // Limpa placeholder da descrição se tiver
+                    if($txtDesc.val() === "Buscando dados na FIPE...") $txtDesc.val("");
+
+                } else {
+                    // VOLTA PARA AUTOMÁTICO
+                    $fipeCard.removeClass('opacity-50');
+                    $badgeStatus.removeClass('bg-secondary text-white').addClass('bg-info text-dark').text('Automação FIPE Ativa');
+
+                    // Reativa o campo se já tiver modelo selecionado
+                    if ($ddlModel.val()) {
+                        $ddlFipeYear.prop('disabled', false);
+                    }
+                }
+            });
+
+            // --- LÓGICA 1: CARREGAR MODELOS ---
+            $ddlManufacturer.on('change', function () {
                 const manufacturerId = $(this).val();
 
-                // Limpa o dropdown de modelos e avisa o Select2
-                $model.empty().trigger('change');
+                // Reseta dependentes
+                $ddlModel.empty().append(new Option("Carregando...", "", true, true)).trigger('change');
+                $ddlFipeYear.empty().append(new Option("-- Selecione o Modelo primeiro --", "")).trigger('change').prop('disabled', true);
 
                 if (!manufacturerId) {
-                    $model.prop('disabled', true);
+                    $ddlModel.prop('disabled', true);
                     return;
                 }
 
-                // Adiciona item "Carregando..."
-                const loadingOption = new Option("Carregando modelos...", "", true, true);
-                $model.append(loadingOption).trigger('change');
-                $model.prop('disabled', true);
-
-                // 4. Chamada AJAX
                 $.ajax({
                     url: '/Vehicle/GetModelsByManufacturer',
                     data: { manufacturerId: manufacturerId },
                     success: function (data) {
-                        // Limpa o "Carregando..."
-                        $model.empty();
+                        $ddlModel.empty();
+                        $ddlModel.append(new Option("-- Selecione um Modelo --", "", true, true));
 
-                        // Adiciona opção padrão
-                        $model.append(new Option("-- Selecione um Modelo --", "", true, true));
+                        $.each(data, function (index, item) {
+                            const code = item.code || item.codigo;
+                            const name = item.name || item.nome;
+                            $ddlModel.append(new Option(name, code, false, false));
+                        });
 
-                        if (data.length === 0) {
-                            $model.append(new Option("Nenhum modelo encontrado", "", false, false));
-                        } else {
-                            // Loop para preencher a lista
-                            $.each(data, function (index, item) {
-                                // Tenta pegar o nome independente de maiúscula/minúscula
-                                const nome = item.nome || item.name || item.Name || "Sem Nome";
-
-                                // Cria a opção e adiciona
-                                const newOption = new Option(nome, nome, false, false);
-                                $model.append(newOption);
-                            });
-                        }
-
-                        // ATUALIZA O SELECT2 (Crucial!)
-                        $model.trigger('change');
-                        $model.prop('disabled', false);
+                        $ddlModel.trigger('change').prop('disabled', false);
                     },
-                    error: function (err) {
-                        console.error("Erro Ajax:", err);
-                        $model.empty();
-                        $model.append(new Option("Erro ao carregar", "", true, true));
-                        $model.trigger('change');
+                    error: function () {
+                        $ddlModel.empty().append(new Option("Erro ao carregar", "")).trigger('change');
                     }
                 });
+            });
+
+            // --- LÓGICA 2: CARREGAR VERSÕES FIPE ---
+            $ddlModel.on('change', function () {
+                // Se estiver em modo manual, não carrega FIPE
+                if ($toggleManual.is(':checked')) return;
+
+                const modelCode = $(this).val();
+                const manufacturerId = $ddlManufacturer.val();
+
+                $ddlFipeYear.empty().append(new Option("Carregando versões...", "", true, true)).trigger('change').prop('disabled', true);
+
+                if (!modelCode || !manufacturerId) {
+                    $ddlFipeYear.empty().append(new Option("-- Selecione o Modelo primeiro --", "")).trigger('change');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Vehicle/GetYearsByModel',
+                    data: { manufacturerId: manufacturerId, modelId: modelCode },
+                    success: function (data) {
+                        $ddlFipeYear.empty();
+                        $ddlFipeYear.append(new Option("-- Selecione a Versão --", "", true, true));
+
+                        $.each(data, function (index, item) {
+                            const nomeExibicao = item.nome || item.name;
+                            const valorCodigo = item.codigo || item.code;
+                            $ddlFipeYear.append(new Option(nomeExibicao, valorCodigo, false, false));
+                        });
+
+                        $ddlFipeYear.trigger('change').prop('disabled', false);
+                    },
+                    error: function () {
+                        $ddlFipeYear.empty().append(new Option("Sem dados FIPE disponíveis", "")).trigger('change');
+                    }
+                });
+            });
+
+            // --- LÓGICA 3: AUTO-PREENCHIMENTO ---
+            $ddlFipeYear.on('change', function () {
+                const yearCode = $(this).val();
+                const modelCode = $ddlModel.val();
+                const manufacturerId = $ddlManufacturer.val();
+
+                if (!yearCode) return;
+
+                $txtDesc.val("Buscando dados na FIPE...");
+
+                $.ajax({
+                    url: '/Vehicle/GetFipeDetails',
+                    data: { manufacturerId: manufacturerId, modelId: modelCode, yearId: yearCode },
+                    success: function (data) {
+                        if (data) {
+                            $txtPrice.val(data.price);
+                            $txtYear.val(data.year);
+                            $ddlType.val(data.type);
+                            $txtDesc.val(data.description);
+                        }
+                    }
+                });
+            });
+
+            // --- LÓGICA 4: SUBMIT DO FORMULÁRIO ---
+            $('#createForm').on('submit', function () {
+                const selectedText = $("#Model option:selected").text();
+
+                if (selectedText && selectedText !== "-- Selecione um Modelo --") {
+                    $("#Model option:selected").val(selectedText);
+                }
+
+                $ddlModel.prop('disabled', false);
             });
         });
     </script>

@@ -1,13 +1,17 @@
-﻿using System.Net.Http.Json;
-using AutoNexus.Application.DTOs.Fipe;
+﻿using AutoNexus.Application.DTOs.Fipe;
 using AutoNexus.Application.Interfaces;
-using AutoNexus.Domain;
+using System.Text.Json;
 
 namespace AutoNexus.Infrastructure.ExternalServices
 {
     public class FipeService : IFipeService
     {
         private readonly HttpClient _httpClient;
+        private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
+        };
 
         public FipeService(HttpClient httpClient)
         {
@@ -15,19 +19,45 @@ namespace AutoNexus.Infrastructure.ExternalServices
         }
 
         public async Task<IEnumerable<FipeReferenceResponse>> GetBrandsAsync()
-        {
-            // GET: https://parallelum.com.br/fipe/api/v1/carros/marcas
-            var response = await _httpClient.GetFromJsonAsync<IEnumerable<FipeReferenceResponse>>($"{Constants.FIPE_URL}/marcas");
+        {   
+            HttpResponseMessage response = await _httpClient.GetAsync("carros/marcas");
+            response.EnsureSuccessStatusCode();
 
-            return response ?? Enumerable.Empty<FipeReferenceResponse>();
+            string content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<FipeReferenceResponse>>(content, _jsonOptions)
+                   ?? new List<FipeReferenceResponse>();
         }
 
         public async Task<IEnumerable<FipeReferenceResponse>> GetModelsAsync(string brandId)
         {
-            // GET: https://parallelum.com.br/fipe/api/v1/carros/marcas/{id}/modelos
-            var response = await _httpClient.GetFromJsonAsync<FipeModelResponse>($"{Constants.FIPE_URL}/marcas/{brandId}/modelos");
+            HttpResponseMessage response = await _httpClient.GetAsync($"carros/marcas/{brandId}/modelos");
+            response.EnsureSuccessStatusCode();
 
-            return response?.Models ?? Enumerable.Empty<FipeReferenceResponse>();
+            string content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonSerializer.Deserialize<FipeModelResponse>(content, _jsonOptions);
+
+            return result?.Models ?? new List<FipeReferenceResponse>();
+        }
+
+        public async Task<IEnumerable<FipeReferenceResponse>> GetYearsAsync(string brandId, string modelId)
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync($"carros/marcas/{brandId}/modelos/{modelId}/anos");
+            response.EnsureSuccessStatusCode();
+
+            string content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<FipeReferenceResponse>>(content, _jsonOptions)
+                   ?? new List<FipeReferenceResponse>();
+        }
+
+        public async Task<FipeVehicleResponse?> GetVehicleDetailsAsync(string brandId, string modelId, string yearId)
+        {
+            HttpResponseMessage response = await _httpClient.GetAsync($"carros/marcas/{brandId}/modelos/{modelId}/anos/{yearId}");
+
+            if (!response.IsSuccessStatusCode) return null;
+
+            string content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<FipeVehicleResponse>(content, _jsonOptions);
         }
     }
 }

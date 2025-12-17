@@ -229,22 +229,123 @@ namespace AutoNexus.Web.Controllers
         [HttpGet]
         public async Task<JsonResult> GetModelsByManufacturer(int manufacturerId)
         {
-            Manufacturer? manufacturer = await _context.Manufacturers.FindAsync(manufacturerId);
-
-            if (manufacturer == null)
-                return Json(new List<object>());
+            var manufacturer = await _context.Manufacturers.FindAsync(manufacturerId);
+            if (manufacturer == null) return Json(new List<object>());
 
             try
             {
-                return await FetchModelsFromFipeApi(manufacturer.Name);
+                var fipeBrands = await _fipeService.GetBrandsAsync();
+
+                var matchingBrand = fipeBrands.FirstOrDefault(b =>
+                    b.Name.Equals(manufacturer.Name, StringComparison.OrdinalIgnoreCase) ||
+                    b.Name.Contains(manufacturer.Name, StringComparison.OrdinalIgnoreCase) ||
+                    manufacturer.Name.Contains(b.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (matchingBrand == null) return Json(new List<object>());
+
+                var models = await _fipeService.GetModelsAsync(matchingBrand.Code);
+
+                return Json(models.OrderBy(m => m.Name));
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao buscar modelos FIPE: {ex.Message}");
+                return Json(new List<object> { new { name = $"ERRO: {ex.Message}", code = "" } });
+            }
+        }
+        [HttpGet]
+        public async Task<JsonResult> GetYearsByModel(int manufacturerId, string modelId)
+        {
+            try
+            {
+                string? fipeBrandCode = await GetFipeBrandCodeAsync(manufacturerId);
+
+                if (string.IsNullOrEmpty(fipeBrandCode))
+                    return Json(new List<object>());
+
+                IEnumerable<FipeReferenceResponse> years = await _fipeService.GetYearsAsync(fipeBrandCode, modelId);
+                return Json(years.OrderBy(y => y.Name));
+            }
+            catch
+            {
                 return Json(new List<object>());
             }
         }
 
+        [HttpGet]
+        public async Task<JsonResult> GetFipeDetails(int manufacturerId, string modelId, string yearId)
+        {
+            try
+            {
+                string? fipeBrandCode = await GetFipeBrandCodeAsync(manufacturerId);
+
+                if (string.IsNullOrEmpty(fipeBrandCode))
+                    return Json(null);
+
+                FipeVehicleResponse? details = await _fipeService.GetVehicleDetailsAsync(fipeBrandCode, modelId, yearId);
+
+                if (details == null) return Json(null);
+
+                decimal priceValue = ParseFipePrice(details.Price);
+
+                VehicleType typeEnum = MapFipeTypeToDomain(details.VehicleType);
+
+                var result = new
+                {
+                    price = priceValue,
+                    year = details.ModelYear,
+                    type = (int)typeEnum,
+                    description = $"Combustível: {details.Fuel} | Código Fipe: {details.FipeCode} | Referência: {details.ReferenceMonth}"
+                };
+
+                return Json(result);
+            }
+            catch
+            {
+                return Json(null);
+            }
+        }
+
+        private async Task<string?> GetFipeBrandCodeAsync(int manufacturerId)
+        {
+            Manufacturer? manufacturer = await _context.Manufacturers.FindAsync(manufacturerId);
+            if (manufacturer == null) return null;
+
+            IEnumerable<FipeReferenceResponse> brands = await _fipeService.GetBrandsAsync();
+
+            FipeReferenceResponse? fipeBrand = brands.FirstOrDefault(b =>
+                b.Name.Contains(manufacturer.Name, StringComparison.OrdinalIgnoreCase) ||
+                manufacturer.Name.Contains(b.Name, StringComparison.OrdinalIgnoreCase));
+
+            return fipeBrand?.Code?.ToString();
+        }
+
+        private decimal ParseFipePrice(string priceString)
+        {
+            if (string.IsNullOrEmpty(priceString)) return 0;
+
+            string cleanPrice = priceString
+                .Replace("R$", "")
+                .Replace(".", "")
+                .Replace(" ", "")
+                .Trim();
+
+            if (decimal.TryParse(cleanPrice, out decimal result))
+            {
+                return result;
+            }
+            return 0;
+        }
+
+        private VehicleType MapFipeTypeToDomain(int fipeTypeId)
+        {
+            return fipeTypeId switch
+            {
+                1 => VehicleType.Car,
+                2 => VehicleType.Motorcycle,
+                3 => VehicleType.Truck,
+                _ => VehicleType.Other
+            };
+        }
         private async Task<JsonResult> FetchModelsFromFipeApi(string brandName)
         {
             string cleanBrandName = brandName?.Trim() ?? string.Empty;
