@@ -18,3 +18,9 @@ wwwroot/lib/
 # --- Logs e Temporários ---
 *.log
 .DS_Store
+
+# Resultados de Testes e Cobertura
+TestResults/
+coveragereport/
+*.opencover.xml
+*.cobertura.xml
