@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - AutoNexus</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="icon" type="image/x-icon" href="~/assets/favicon.ico" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AutoNexus.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -16,7 +17,9 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-autonexus border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">AutoNexus</a>
+                    <a class="navbar-brand" asp-area="" asp-page="/Index">
+                        <i class="bi bi-speedometer2 me-2"></i> Auto<span>Nexus</span>
+                    </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -24,7 +27,7 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Vehicle" asp-action="Index">Veículos</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Vehicle" asp-action="Index">Estoque</a>
                         </li>
 
                         <li class="nav-item">
@@ -45,7 +48,7 @@
 
     <footer class="border-top footer text-muted mt-auto">
         <div class="container">
-            &copy; 2025 - AutoNexus - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2025 - AutoNexus
         </div>
     </footer>
 

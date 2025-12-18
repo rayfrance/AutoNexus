@@ -233,3 +233,24 @@ a:hover {
 .gap-2 a {
     text-decoration: none !important;
 }
+
+/* Estilo Premium para a Marca */
+.navbar-brand {
+    font-weight: 800 !important; /* Extra Negrito */
+    letter-spacing: -0.5px; /* Deixa as letras mais juntas e modernas */
+    font-size: 1.4rem;
+    color: #0d6efd !important; /* Azul principal do projeto */
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+    .navbar-brand:hover {
+        transform: scale(1.05);
+        text-decoration: none !important; /* Leve pulso ao passar o mouse */
+    }
+
+.navbar-brand span {
+    color: #6c757d; /* "Nexus" em cinza para contraste */
+}

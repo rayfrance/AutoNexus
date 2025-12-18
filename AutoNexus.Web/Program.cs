@@ -15,6 +15,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+DotNetEnv.Env.Load();
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
