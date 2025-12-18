@@ -64,7 +64,7 @@ namespace AutoNexus.Infrastructure.Data
                 new Vehicle { Model = "Civic Touring", Year = 2021, Price = 160000, Status = VehicleStatus.Available, ManufacturerId = manufacturers[1].Id },
                 new Vehicle { Model = "Mustang GT", Year = 2020, Price = 450000, Status = VehicleStatus.Sold, ManufacturerId = manufacturers[2].Id },
                 new Vehicle { Model = "Onix Plus", Year = 2023, Price = 85000, Status = VehicleStatus.Available, ManufacturerId = manufacturers[3].Id },
-                new Vehicle { Model = "320i M Sport", Year = 2024, Price = 320000, Status = VehicleStatus.Reserved, ManufacturerId = manufacturers[4].Id },
+                new Vehicle { Model = "320i M Sport", Year = 2024, Price = 320000, Status = VehicleStatus.Sold, ManufacturerId = manufacturers[4].Id },
                 new Vehicle { Model = "Yaris Hatch", Year = 2023, Price = 98000, Status = VehicleStatus.Available, ManufacturerId = manufacturers[0].Id },
                 new Vehicle { Model = "City Hatch", Year = 2024, Price = 115000, Status = VehicleStatus.Available, ManufacturerId = manufacturers[1].Id }
             };

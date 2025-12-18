@@ -36,7 +36,7 @@ namespace AutoNexus.Infrastructure.Services
                 .Include(s => s.Client)
                 .Include(s => s.Vehicle)
                 .ThenInclude(v => v.Manufacturer)
-                .OrderByDescending(s => s.SaleDate)
+                .OrderByDescending(s => s.CreatedAt)
                 .ToListAsync();
         }
 
@@ -57,7 +57,7 @@ namespace AutoNexus.Infrastructure.Services
                     s.Vehicle.Model.Contains(searchString)
                 );
             }
-            query = query.OrderByDescending(s => s.SaleDate);
+            query = query.OrderByDescending(s => s.CreatedAt);
 
             return await PaginatedList<Sale>.CreateAsync(query, pageNumber, pageSize);
         }

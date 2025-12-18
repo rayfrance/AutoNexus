@@ -73,7 +73,6 @@
                             string badgeClass = item.Status switch
                             {
                                 VehicleStatus.Available => "bg-success",
-                                VehicleStatus.Reserved => "bg-warning text-dark",
                                 VehicleStatus.Sold => "bg-secondary",
                                 _ => "bg-light text-dark"
                             };
@@ -84,7 +83,7 @@
                                 <td>@item.Year</td>
                                 <td class="fw-bold text-primary">@item.Price.ToString("C")</td>
                                 <td>
-                                    <span class="badge @badgeClass">@item.Status</span>
+                                    <span class="badge @badgeClass">@(item.Status == AutoNexus.Domain.Enums.VehicleStatus.Available ? "Disponível" : "Vendido")</span>
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group" role="group">

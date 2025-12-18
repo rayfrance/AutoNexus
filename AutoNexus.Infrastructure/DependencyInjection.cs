@@ -28,7 +28,6 @@ namespace AutoNexus.Infrastructure
             {
                 client.BaseAddress = new Uri(Constants.FIPE_URL);
             });
-            services.AddHttpClient<IAddressService, ViaCepService>();
 
             services.AddScoped<ISaleService, SaleService>();
 

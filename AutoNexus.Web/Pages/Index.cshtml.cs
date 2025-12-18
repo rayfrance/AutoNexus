@@ -55,7 +55,7 @@ namespace AutoNexus.Web.Pages
             RecentSales = await _context.Sales
                 .Include(s => s.Vehicle)
                 .Include(s => s.Client)
-                .OrderByDescending(s => s.SaleDate)
+                .OrderByDescending(s => s.CreatedAt)
                 .Take(5)
                 .ToListAsync();
         }
@@ -136,7 +136,7 @@ namespace AutoNexus.Web.Pages
             var sales = await _context.Sales
                 .Include(s => s.Vehicle)
                 .Include(s => s.Client)
-                .OrderByDescending(s => s.SaleDate)
+                .OrderByDescending(s => s.CreatedAt)
                 .ToListAsync();
 
             var builder = new StringBuilder();

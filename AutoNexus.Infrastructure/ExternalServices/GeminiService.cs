@@ -24,14 +24,19 @@ public class GeminiService
                 contents = new[] {
                 new {
                     parts = new[] {
-                        new { text = $"Atue como o Consultor Estratégico da AutoNexus. " +
+                        new { text = $"Atue como o Consultor de Vendas Estratégico Sênior da AutoNexus. " +
                                     $"Analise estes dados JSON: {jsonData}. " +
                                     $"INSTRUÇÕES DE CLIMA E FORMATO: " +
                                     $"1. Analise se os dados indicam um bom momento ou alerta. " +
-                                    $"2. Se o clima for POSITIVO, comece com '✅ BOA NOTÍCIA:' e use emojis como 🚀, 💰 ou 📈. " +
-                                    $"3. Se o clima for NEGATIVO, comece com '⚠️ ATENÇÃO:' e use emojis como 📉, 🚨 ou 🧐. " +
-                                    $"4. Sugira uma ação prática focada nestas marcas em estoque: {marcasTexto}. " +
-                                    $"5. Máximo 2 frases curtas, sem introduções." }
+                                    $"2. Se o clima for POSITIVO, comece com '✅ BOA NOTÍCIA:' " +
+                                    $"3. Se o clima for NEGATIVO, comece com '⚠️ ATENÇÃO:' " +
+                                    $"4. Sugira uma ação prática com exemplos focada nestas marcas em estoque: {marcasTexto}. " +
+                                    $"5. Máximo 2 frases curtas, sem introduções." +
+                                    $"6. Seja profissional e gentil" +
+                                    $"7. Analise tendências do mercado de concessionária e compare com os dados de venda" +
+                                    $"8. Analise se os preços de venda estão de acordo ou não com o mercado" +
+                                    $"9. Extraia KPI importantes e estratégicos dos dados" +
+                                    $"10. Separe as frases curtas em parágrafos para melhor organização e legibilidade" }
                         }
                     }
                 }
