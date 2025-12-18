@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace AutoNexus.Web.Controllers
 {
     [Authorize]
+    [Route("api/[controller]")]
     public class SaleController : Controller
     {
         private readonly ISaleService _saleService;
@@ -23,9 +24,7 @@ namespace AutoNexus.Web.Controllers
         public async Task<IActionResult> Index(string searchString, int? pageNumber)
         {
             ViewData["CurrentFilter"] = searchString;
-
             var paginatedSales = await _saleService.SearchSalesAsync(searchString, pageNumber ?? 1, Constants.DEFAULT_PAGE_SIZE);
-
             return View(paginatedSales);
         }
 
@@ -33,7 +32,7 @@ namespace AutoNexus.Web.Controllers
 
         #region 2. CRIAÇÃO (Create)
 
-        [HttpGet]
+        [HttpGet("create")] 
         [ActionName("Create")]
         public async Task<IActionResult> OpenSaleForm()
         {
@@ -41,7 +40,7 @@ namespace AutoNexus.Web.Controllers
             return View("CreationForm", viewModel);
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitSaleForm(SaleFormViewModel viewModel)
@@ -61,7 +60,6 @@ namespace AutoNexus.Web.Controllers
                     };
 
                     await _saleService.ProcessSaleAsync(dto);
-
                     return RedirectToAction("Index");
                 }
                 catch (Exception ex)
@@ -76,12 +74,9 @@ namespace AutoNexus.Web.Controllers
 
         #endregion
 
-        #region 3. API / AJAX (Novos Métodos para o Front-end)
+        #region 3. API / AJAX 
 
-        /// <summary>
-        /// Endpoint chamado pelo JavaScript para buscar dados do cliente pelo CPF
-        /// </summary>
-        [HttpGet]
+        [HttpGet("search-client/{cpf}")] // MODIFICADO: Rota parametrizada
         public async Task<IActionResult> SearchClient(string cpf)
         {
             if (string.IsNullOrWhiteSpace(cpf))
@@ -91,7 +86,8 @@ namespace AutoNexus.Web.Controllers
 
             if (client == null)
             {
-                return NotFound();             }
+                return NotFound();
+            }
 
             return Json(new { name = client.Name, phone = client.Phone });
         }

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace AutoNexus.Web.Controllers
 {
     [Authorize]
+    [Route("api/[controller]")]
     public class VehicleController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -72,7 +73,7 @@ namespace AutoNexus.Web.Controllers
 
         #region 2. CRIAÇÃO (Create) - PROTEGIDO (ADMIN)
 
-        [HttpGet]
+        [HttpGet("create")]
         [ActionName("Create")]
         [Authorize(Roles = Constants.ADMIN_ROLE)]
         public async Task<IActionResult> OpenCreationForm()
@@ -81,7 +82,7 @@ namespace AutoNexus.Web.Controllers
             return View("CreationForm", viewModel);
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = Constants.ADMIN_ROLE)]
@@ -127,7 +128,7 @@ namespace AutoNexus.Web.Controllers
 
         #region 3. EDIÇÃO (Edit) - PROTEGIDO (ADMIN)
 
-        [HttpGet]
+        [HttpGet("edit/{id}")]
         [ActionName("Edit")]
         [Authorize(Roles = Constants.ADMIN_ROLE)]
         public async Task<IActionResult> OpenEditionForm(int? id)
@@ -142,7 +143,7 @@ namespace AutoNexus.Web.Controllers
             return View("EditionForm", viewModel);
         }
 
-        [HttpPost]
+        [HttpPost("edit/{id}")]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = Constants.ADMIN_ROLE)]
@@ -205,7 +206,7 @@ namespace AutoNexus.Web.Controllers
 
         #region 4. DELEÇÃO (Delete) - PROTEGIDO (ADMIN)
 
-        [HttpGet]
+        [HttpGet("delete/{id}")]
         [ActionName("Delete")]
         [Authorize(Roles = Constants.ADMIN_ROLE)]
         public async Task<IActionResult> OpenDeleteConfirmation(int? id)
@@ -222,7 +223,8 @@ namespace AutoNexus.Web.Controllers
             return View("Delete", vehicle);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost("delete/{id}")]
+        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = Constants.ADMIN_ROLE)]
         public async Task<IActionResult> SubmitDeleteConfirmation(int id)
@@ -240,9 +242,9 @@ namespace AutoNexus.Web.Controllers
 
         #endregion
 
-        #region 5. SERVIÇOS AUXILIARES (Helpers & API)
+        #region 5. SERVIÇOS AUXILIARES (API / AJAX)
 
-        [HttpGet]
+        [HttpGet("models-list/{manufacturerId}")]
         public async Task<JsonResult> GetModelsByManufacturer(int manufacturerId)
         {
             var manufacturer = await _context.Manufacturers.FindAsync(manufacturerId);
@@ -269,7 +271,7 @@ namespace AutoNexus.Web.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("years-list/{manufacturerId}/{modelId}")]
         public async Task<JsonResult> GetYearsByModel(int manufacturerId, string modelId)
         {
             try
@@ -288,7 +290,7 @@ namespace AutoNexus.Web.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("fipe-details-lookup/{manufacturerId}/{modelId}/{yearId}")]
         public async Task<JsonResult> GetFipeDetails(int manufacturerId, string modelId, string yearId)
         {
             try
@@ -321,6 +323,10 @@ namespace AutoNexus.Web.Controllers
                 return Json(null);
             }
         }
+
+        #endregion
+
+        #region Helpers Privados
 
         private async Task<string?> GetFipeBrandCodeAsync(int manufacturerId)
         {
