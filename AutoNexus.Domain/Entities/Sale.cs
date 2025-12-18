@@ -1,5 +1,4 @@
 ﻿using AutoNexus.Domain.Common;
-using System.ComponentModel.DataAnnotations;
 
 namespace AutoNexus.Domain.Entities
 {

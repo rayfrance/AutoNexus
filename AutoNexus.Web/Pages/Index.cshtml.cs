@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using AutoNexus.Infrastructure.Data;
 using AutoNexus.Domain.Enums;
 
+
 namespace AutoNexus.Web.Pages
 {
     public class IndexModel : PageModel
@@ -18,6 +19,7 @@ namespace AutoNexus.Web.Pages
         public List<string> ManufacturerLabels { get; set; } = new();
         public List<int> VehicleCounts { get; set; } = new();
         public string AiInsights { get; set; } = string.Empty;
+        public List<Domain.Entities.Sale> RecentSales { get; set; } = new();
 
         public IndexModel(ApplicationDbContext context, GeminiService geminiService)
         {
@@ -43,6 +45,18 @@ namespace AutoNexus.Web.Pages
             await GetKpiData(firstDayOfMonth);
 
             await GetChartData(firstDayOfMonth);
+
+            await GetRecentSales();
+        }
+
+        private async Task GetRecentSales()
+        {
+            RecentSales = await _context.Sales
+                .Include(s => s.Vehicle)
+                .Include(s => s.Client)
+                .OrderByDescending(s => s.SaleDate)
+                .Take(5)
+                .ToListAsync();
         }
 
         private async Task GetKpiData(DateTime firstDayOfMonth)
