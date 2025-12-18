@@ -2,6 +2,8 @@ using AutoNexus.Infrastructure;
 using AutoNexus.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 
+DotNetEnv.Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -15,7 +17,6 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-DotNetEnv.Env.Load();
 
 builder.Services.AddRazorPages();
 

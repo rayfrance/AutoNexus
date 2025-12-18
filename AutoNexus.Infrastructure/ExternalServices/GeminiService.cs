@@ -8,7 +8,7 @@ public class GeminiService
 
     public GeminiService(HttpClient httpClient)
     {
-        _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
+        _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY") ?? string.Empty;
         _httpClient = httpClient;
     }
 
