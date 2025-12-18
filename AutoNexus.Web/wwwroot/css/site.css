@@ -209,3 +209,27 @@ a:hover {
 .quick-action-btn:hover i {
     transform: scale(1.1);
 }
+
+/* Estilo Personalizado para o Botão de Exportação */
+.btn-export-excel {
+    color: #198754; /* Verde Bootstrap sutil */
+    border: 1px solid #198754;
+    background-color: transparent;
+    transition: all 0.3s ease;
+    text-decoration: none !important; /* Remove o sublinhado */
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-export-excel:hover {
+    background-color: #198754;
+    color: white !important;
+    text-decoration: none !important; 
+    shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Remove sublinhado de links dentro da div de botões */
+.gap-2 a {
+    text-decoration: none !important;
+}

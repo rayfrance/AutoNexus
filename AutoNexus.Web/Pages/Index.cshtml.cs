@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using AutoNexus.Infrastructure.Data;
 using AutoNexus.Domain.Enums;
+using System.Text;
 
 
 namespace AutoNexus.Web.Pages
@@ -129,6 +130,25 @@ namespace AutoNexus.Web.Pages
             }
 
             return Page();
+        }
+        public async Task<IActionResult> OnGetExportSalesCsvAsync()
+        {
+            var sales = await _context.Sales
+                .Include(s => s.Vehicle)
+                .Include(s => s.Client)
+                .OrderByDescending(s => s.SaleDate)
+                .ToListAsync();
+
+            var builder = new StringBuilder();
+            builder.AppendLine("Numero de Protocolo;Data;Cliente;CPF;Veiculo;Valor Vendido");
+
+            foreach (var sale in sales)
+            {
+                builder.AppendLine($"{sale.ProtocolNumber};{sale.SaleDate:dd/MM/yyyy};{sale.Client.Name};{sale.Client.CPF};{sale.Vehicle.Model};{sale.SalePrice:F2}");
+            }
+
+            var csvBytes = Encoding.UTF8.GetBytes(builder.ToString());
+            return File(csvBytes, "text/csv", $"Relatorio_Vendas_AutoNexus_{DateTime.Now.Date:dd_MM_yyyy}.csv");
         }
     }
 }
