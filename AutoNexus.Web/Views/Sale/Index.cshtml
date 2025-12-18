@@ -12,9 +12,16 @@
         <h2 class="mb-0"><i class="bi bi-receipt"></i> Histórico de Vendas</h2>
         <small class="text-muted">Gerencie recibos e consulte transações</small>
     </div>
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-cart-plus"></i> Nova Venda
-    </a>
+
+    <div class="d-flex gap-2">
+        <a asp-page="/Index" asp-page-handler="ExportSalesCsv" class="btn btn-export-excel px-3">
+            <i class="bi bi-file-earmark-excel me-1"></i> Exportar Dados
+        </a>
+
+        <a asp-action="Create" class="btn btn-success px-3 shadow-sm">
+            <i class="bi bi-cart-plus me-1"></i> Nova Venda
+        </a>
+    </div>
 </div>
 
 <div class="card p-3 mb-4 shadow-sm border-0 bg-light">

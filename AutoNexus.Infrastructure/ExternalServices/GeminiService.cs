@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 
 public class GeminiService
@@ -7,9 +6,9 @@ public class GeminiService
     private readonly string _apiKey;
     private readonly HttpClient _httpClient;
 
-    public GeminiService(IConfiguration config, HttpClient httpClient)
+    public GeminiService(HttpClient httpClient)
     {
-        _apiKey = config["GeminiSettings:ApiKey"];
+        _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY") ?? string.Empty;
         _httpClient = httpClient;
     }
 

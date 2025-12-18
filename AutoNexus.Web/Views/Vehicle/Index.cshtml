@@ -3,7 +3,7 @@
 @using AutoNexus.Domain
 
 @{
-    ViewData["Title"] = "Veículos";
+    ViewData["Title"] = "Estoque";
     Layout = "~/Pages/Shared/_Layout.cshtml";
     string? currentFilter = ViewData["CurrentFilter"] as string;
 }
@@ -88,7 +88,7 @@
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="btn-group" role="group">
-                                        @* ANX-25: Ações restritas para Admin *@
+                                        @* Ações restritas para Admin *@
                                         @if (User.IsInRole(Constants.ADMIN_ROLE))
                                         {
                                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Editar">
